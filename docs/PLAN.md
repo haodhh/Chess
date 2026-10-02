@@ -400,21 +400,21 @@ các theme yếu ở module Puzzle.
 3. Learn bị chặn bởi việc **viết nội dung**, nên làm engine bài học sau. Nội dung bài thì viết song song ngay từ Phase 1.
 
 ### Phase 0 — Nền móng (~1 tuần)
-- [ ] Khởi tạo Vite + React + TS + Tailwind, ESLint/Prettier, Vitest; CI trên GitHub Actions; deploy bản preview.
-- [ ] Component `ChessBoard`: kéo-thả và click-click, hộp chọn phong cấp, highlight nước vừa đi, mũi tên, âm thanh, lật bàn.
-- [ ] `Game` model bọc chess.js; `MoveList`; `EvalBar`.
-- [ ] Engine service: Stockfish WASM chạy trong worker, API `analyse(fen, {depth, multiPv})` và `bestMove(fen, opts)`.
-- [ ] Dexie DB; layout và điều hướng (Home, Puzzles, Train, Learn, Settings); i18n tiếng Việt.
+- [x] Khởi tạo Vite + React + TS + Tailwind, Vitest; CI và deploy GitHub Pages trên GitHub Actions. (Chưa có ESLint/Prettier.)
+- [x] Component `ChessBoard` (chessground): kéo-thả và click-click, hộp chọn phong cấp, highlight nước vừa đi, mũi tên, âm thanh, 4 màu bàn cờ.
+- [ ] `Game` model bọc chess.js; `MoveList`; `EvalBar`. (Đã có MoveList trong màn puzzle; EvalBar làm cùng engine ở Phase 2.)
+- [ ] Engine service: Stockfish WASM chạy trong worker, API `analyse(fen, {depth, multiPv})` và `bestMove(fen, opts)`. (Dời sang Phase 2, vì Puzzle không cần engine.)
+- [x] Dexie DB; layout và điều hướng (Home, Puzzles, Train, Learn, Settings); giao diện tiếng Việt.
 - **Xong khi:** hai người chơi được một ván đúng luật trên cùng một máy, engine trả về nước tốt nhất, bản build đã lên mạng.
 
 ### Phase 1 — Puzzle (~2–3 tuần)
-- [ ] Script dựng dữ liệu puzzle (lọc và chia shard) cùng chỉ mục theme.
-- [ ] `Position Trainer`: tự đi nước đối thủ, kiểm tra nước, chấp nhận nước chiếu hết thay thế, hint, xem lời giải.
-- [ ] Chế độ Rated + Glicko-2 + chọn độ khó.
-- [ ] Chế độ theo chủ đề (lọc theme và khoảng rating).
-- [ ] Ôn lỗi bằng SRS (FSRS).
-- [ ] Puzzle Rush (3 phút / 5 phút / Survival) cùng kỷ lục.
-- [ ] Thống kê: biểu đồ rating, tỉ lệ đúng theo theme, theme yếu nhất.
+- [x] Script dựng dữ liệu puzzle (lọc và chia shard) cùng chỉ mục theme; workflow **Build puzzle data** chạy trên GitHub Actions.
+- [x] `Position Trainer`: tự đi nước đối thủ, kiểm tra nước, chấp nhận nước chiếu hết thay thế, hint, xem lời giải.
+- [x] Chế độ Rated + Glicko-2 + chọn độ khó.
+- [x] Chế độ theo chủ đề (lọc theme, chọn puzzle quanh rating của bạn).
+- [x] Ôn lỗi bằng SRS (FSRS).
+- [x] Puzzle Rush (3 phút / 5 phút / Survival) cùng kỷ lục.
+- [x] Thống kê: biểu đồ rating, tỉ lệ đúng theo theme, theme yếu nhất.
 - **Xong khi:** giải liên tục 50 puzzle không lỗi giao diện, rating cập nhật đúng (có unit test Glicko-2),
   puzzle sai xuất hiện lại đúng lịch ôn.
 
@@ -437,8 +437,9 @@ các theme yếu ở module Puzzle.
 - **Xong khi:** học hết một lộ trình từ đầu đến cuối, mỗi bài kết thúc bằng một bộ puzzle đúng chủ đề.
 
 ### Phase 4 — Hoàn thiện (~1–2 tuần)
-- [ ] Dashboard: mục tiêu ngày, streak, gợi ý luyện theo điểm yếu.
-- [ ] Daily puzzle; PWA offline; tối ưu mobile; backup và khôi phục dữ liệu; thêm tiếng Anh.
+- [x] Dashboard: mục tiêu ngày, streak, gợi ý luyện theo điểm yếu.
+- [x] Daily puzzle; backup và khôi phục dữ liệu; giao diện mobile cơ bản.
+- [ ] PWA offline; thêm tiếng Anh.
 
 ### Phase 5 — Sau MVP (tùy chọn)
 - Tài khoản và đồng bộ cloud (vd. Supabase).
@@ -480,8 +481,8 @@ Mỗi tuần xem lại rating puzzle và các theme yếu để chọn trọng t
 ## 9. Các quyết định cần xác nhận trước khi code
 
 1. **Nền tảng:** Web/PWA (đề xuất) hay app native?
-2. **Hosting:** Vercel (đề xuất), Netlify hay GitHub Pages?
+2. **Hosting:** ~~Vercel, Netlify hay GitHub Pages?~~ Đã chọn **GitHub Pages** (Stockfish sẽ dùng bản single-thread).
 3. **License GPL-3.0** cho dự án: đồng ý không?
 4. Có cần **nhập ván từ tài khoản chess.com** của bạn ngay ở Phase 2 không? (Đề xuất: có, vì đây là nguồn lỗi thật để luyện.)
 
-Sau khi xác nhận, bắt đầu **Phase 0**.
+**Trạng thái (10/2026):** đã xong Phase 0 (trừ engine) và Phase 1 – Puzzle, chạy trên GitHub Pages.
