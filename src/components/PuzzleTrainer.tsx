@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { isProvisional } from '../core/glicko2';
 import type { Puzzle } from '../core/puzzle';
 import { themeName } from '../core/themes';
@@ -19,8 +19,22 @@ interface Result {
   delta?: number;
 }
 
-/** Endless rated puzzles around the player's rating, optionally limited to one theme. */
-export function PuzzleTrainer({ mode, theme }: { mode: PuzzleMode; theme?: string }) {
+/** Endless rated puzzles around the player's rating, optionally limited to one theme or solution length. */
+export function PuzzleTrainer({
+  mode,
+  theme,
+  moves,
+  mateOnly,
+  top,
+}: {
+  mode: PuzzleMode;
+  theme?: string;
+  /** Only puzzles that take exactly this many of the player's moves. */
+  moves?: number;
+  mateOnly?: boolean;
+  /** Shown at the top of the panel, e.g. a picker for the filter. */
+  top?: ReactNode;
+}) {
   const profile = useProfile();
   const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,14 +50,14 @@ export function PuzzleTrainer({ mode, theme }: { mode: PuzzleMode; theme?: strin
       setError(null);
       seen.current ??= await attemptedIds();
       const target = currentRating(p).rating + p.settings.difficulty;
-      const next = await findPuzzle({ target, exclude: seen.current, theme });
+      const next = await findPuzzle({ target, exclude: seen.current, theme, moves, mateOnly });
       if (!next) throw new Error('Không tìm thấy puzzle phù hợp.');
       seen.current.add(next.id);
       setPuzzle(next);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
-  }, [theme]);
+  }, [theme, moves, mateOnly]);
 
   const ready = profile?.onboarded;
   useEffect(() => {
@@ -66,6 +80,7 @@ export function PuzzleTrainer({ mode, theme }: { mode: PuzzleMode; theme?: strin
 
   const header = (
     <div className="card">
+      {top}
       {theme && (
         <div className="mb-2 text-sm text-muted">
           Chủ đề: <b className="text-white">{themeName(theme)}</b>

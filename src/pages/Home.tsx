@@ -5,6 +5,7 @@ import { Onboarding } from '../components/Onboarding';
 import { isProvisional } from '../core/glicko2';
 import { attemptsToday, streakDays, themeStats, weakestThemes } from '../core/stats';
 import { themeName } from '../core/themes';
+import { MAX_MOVES } from '../data/puzzleData';
 import { currentRating, useAttempts, useDueCount, useProfile, useRushBest } from '../data/store';
 
 export function Home() {
@@ -53,6 +54,27 @@ export function Home() {
       <Link to="/puzzles" className="btn btn-primary py-5 text-xl">
         🧩 Giải puzzle
       </Link>
+
+      <section className="card !p-3 sm:!p-4">
+        <div className="mb-2 flex items-baseline justify-between gap-2">
+          <h2 className="font-bold">🔢 Thắng trong … nước</h2>
+          <Link to="/moves" className="link text-sm">
+            Tất cả
+          </Link>
+        </div>
+        <div className="grid grid-cols-5 gap-1.5 sm:grid-cols-10">
+          {Array.from({ length: MAX_MOVES }, (_, i) => i + 1).map((n) => (
+            <Link
+              key={n}
+              to={`/moves/${n}`}
+              className="flex h-11 items-center justify-center rounded-lg bg-panel-2 text-lg font-extrabold transition-colors hover:bg-accent hover:text-white"
+              aria-label={`Thắng trong ${n} nước`}
+            >
+              {n}
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <section className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
         <Tile to="/review" icon="🔁" title="Ôn lỗi" desc={due > 0 ? `${due} bài đến hạn ôn` : 'Không có bài đến hạn'} highlight={due > 0} />

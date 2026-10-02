@@ -16,6 +16,7 @@ interface NavItem {
 const NAV: NavItem[] = [
   { to: '/', icon: '🏠', label: 'Trang chủ', tab: 'Trang chủ' },
   { to: '/puzzles', icon: '🧩', label: 'Puzzle', tab: 'Puzzle' },
+  { to: '/moves', icon: '🔢', label: 'Theo số nước' },
   { to: '/themes', icon: '🎯', label: 'Chủ đề' },
   { to: '/rush', icon: '⚡', label: 'Rush' },
   { to: '/review', icon: '🔁', label: 'Ôn lỗi' },

@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { decayRd, updateGlicko } from '../core/glicko2';
-import type { Puzzle } from '../core/puzzle';
+import { solverMoves, type Puzzle } from '../core/puzzle';
 import type { Card } from 'ts-fsrs';
 import { naturalKey, RESET_AT, SYNC_TABLES, TOMBSTONES, type Row, type TableName, type Tables } from './merge';
 import { gradeFor, reviveCard, scheduleReview } from '../core/srs';
@@ -115,6 +115,7 @@ export async function recordAttempt(input: AttemptInput): Promise<AttemptResult>
       timeMs,
       puzzleRating: puzzle.rating,
       themes: puzzle.themes,
+      moves: solverMoves(puzzle),
       ...result,
     });
 

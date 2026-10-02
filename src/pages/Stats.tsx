@@ -11,6 +11,7 @@ import { currentRating, useAttempts, useDueCount, useProfile, useRushBest } from
 const MODE_LABEL: Record<PuzzleMode, string> = {
   rated: 'Tính điểm',
   theme: 'Chủ đề',
+  moves: 'Số nước',
   rush: 'Rush',
   review: 'Ôn lỗi',
   daily: 'Hằng ngày',

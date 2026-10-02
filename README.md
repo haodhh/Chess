@@ -8,6 +8,7 @@
 
 **Puzzle**
 - **Puzzle tính điểm:** chọn quanh rating của bạn (Glicko-2), 3 mức độ khó, gợi ý, xem lời giải, xem lại từng nước.
+- **Theo số nước:** chọn bài thắng trong 1, 2, … 10 nước (hoặc chỉ các bài chiếu hết), kèm tỉ lệ đúng từng loại.
 - **Theo chủ đề:** hơn 60 chủ đề (chĩa đôi, ghim, các mẫu chiếu hết, tàn cuộc…) kèm tỉ lệ đúng của bạn.
 - **Puzzle Rush** (3 phút / 5 phút / Sống sót), **Puzzle hằng ngày**.
 - **Ôn lỗi:** puzzle giải sai và lỗi trong ván của bạn được hẹn lịch ôn bằng FSRS.
@@ -50,7 +51,7 @@ Công nghệ: React + TypeScript + Vite, Tailwind CSS, [chessground](https://git
 
 ## Dữ liệu puzzle
 
-`public/data/puzzles/` chứa khoảng 60.000 puzzle lấy mẫu từ [kho puzzle của Lichess](https://database.lichess.org/#puzzles) (CC0), chia theo mức rating 100 điểm. Để tạo lại dữ liệu, chạy workflow **Build puzzle data** trong tab Actions, hoặc chạy trên máy:
+`public/data/puzzles/` chứa khoảng 60.000 puzzle lấy mẫu từ [kho puzzle của Lichess](https://database.lichess.org/#puzzles) (CC0), chia theo mức rating 100 điểm. Bài dài (5–10 nước) hiếm nên được lấy riêng vào `m05.json` … `m10.json`. Để tạo lại dữ liệu, chạy workflow **Build puzzle data** trong tab Actions, hoặc chạy trên máy:
 
 ```bash
 curl -L https://database.lichess.org/lichess_db_puzzle.csv.zst | zstd -dc | npm run build:puzzles

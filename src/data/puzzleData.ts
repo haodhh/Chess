@@ -5,16 +5,24 @@ export interface PuzzleIndex {
   total: number;
   bandSize: number;
   bands: { band: number; count: number; file: string }[];
+  /** Long puzzles are rare in the rating shards, so each long move count has its own file. */
+  lengths?: { moves: number; count: number; file: string }[];
+  /** Puzzles available for each number of solver moves (all, and ending in mate). */
+  lengthCounts?: Record<string, number>;
+  mateLengthCounts?: Record<string, number>;
   themes: string[];
   themeCounts: Record<string, number>;
 }
+
+/** The longest solutions offered when picking puzzles by move count. */
+export const MAX_MOVES = 10;
 
 type Row = [id: string, fen: string, moves: string, rating: number, themes: number[]];
 
 const dataUrl = (file: string) => `${import.meta.env.BASE_URL}data/puzzles/${file}`;
 
 let indexPromise: Promise<PuzzleIndex> | undefined;
-const bandCache = new Map<number, Promise<Puzzle[]>>();
+const shardCache = new Map<string, Promise<Puzzle[]>>();
 
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
@@ -30,14 +38,12 @@ export function loadIndex(): Promise<PuzzleIndex> {
   return indexPromise;
 }
 
-export async function loadBand(band: number): Promise<Puzzle[]> {
-  let cached = bandCache.get(band);
+function loadShard(file: string): Promise<Puzzle[]> {
+  let cached = shardCache.get(file);
   if (!cached) {
     cached = (async () => {
       const index = await loadIndex();
-      const meta = index.bands.find((b) => b.band === band);
-      if (!meta) return [];
-      const shard = await fetchJson<{ puzzles: Row[] }>(dataUrl(meta.file));
+      const shard = await fetchJson<{ puzzles: Row[] }>(dataUrl(file));
       return shard.puzzles.map(([id, fen, moves, rating, themes]) => ({
         id,
         fen,
@@ -46,10 +52,15 @@ export async function loadBand(band: number): Promise<Puzzle[]> {
         themes: themes.map((t) => index.themes[t]),
       }));
     })();
-    cached.catch(() => bandCache.delete(band));
-    bandCache.set(band, cached);
+    cached.catch(() => shardCache.delete(file));
+    shardCache.set(file, cached);
   }
   return cached;
+}
+
+export async function loadBand(band: number): Promise<Puzzle[]> {
+  const meta = (await loadIndex()).bands.find((b) => b.band === band);
+  return meta ? loadShard(meta.file) : [];
 }
 
 /**
@@ -58,6 +69,11 @@ export async function loadBand(band: number): Promise<Puzzle[]> {
  */
 export async function findPuzzle(opts: SelectOptions & { maxDistance?: number }): Promise<Puzzle | undefined> {
   const index = await loadIndex();
+  const lengthFile = opts.moves !== undefined && index.lengths?.find((l) => l.moves === opts.moves)?.file;
+  if (lengthFile) {
+    const pool = await loadShard(lengthFile);
+    return choosePuzzle(pool, opts) ?? choosePuzzle(pool, { ...opts, exclude: undefined });
+  }
   const maxDistance = opts.maxDistance ?? Infinity;
   const bands = bandsByDistance(
     index.bands.map((b) => b.band),

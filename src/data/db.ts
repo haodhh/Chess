@@ -4,7 +4,7 @@ import type { Glicko } from '../core/glicko2';
 import type { Puzzle } from '../core/puzzle';
 import type { PositionEval } from '../engine/review';
 
-export type PuzzleMode = 'rated' | 'theme' | 'rush' | 'review' | 'daily';
+export type PuzzleMode = 'rated' | 'theme' | 'moves' | 'rush' | 'review' | 'daily';
 export type RushMode = '3m' | '5m' | 'survival';
 export type BoardTheme = 'green' | 'brown' | 'blue' | 'purple';
 
@@ -40,6 +40,8 @@ export interface Attempt {
   timeMs: number;
   puzzleRating: number;
   themes: string[];
+  /** The solver's moves in the puzzle (missing on attempts saved before this was recorded). */
+  moves?: number;
   ratingBefore?: number;
   ratingAfter?: number;
 }

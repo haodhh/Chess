@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { attemptsToday, ratingHistory, streakDays, themeStats, weakestThemes } from './stats';
+import { attemptsToday, lengthStats, movesOf, ratingHistory, streakDays, themeStats, weakestThemes } from './stats';
 
 const day = 24 * 3600_000;
 const now = new Date('2026-03-10T12:00:00').getTime();
@@ -40,5 +40,25 @@ describe('stats', () => {
       { ts: now - 2 * day, rating: 1500 },
       { ts: now, rating: 1520 },
     ]);
+  });
+});
+
+describe('lengthStats', () => {
+  const a = (success: boolean, themes: string[], moves?: number) => ({ ts: 0, success, themes, moves });
+
+  it('uses the recorded move count, or the Lichess length themes for older attempts', () => {
+    expect(movesOf(a(true, [], 4))).toBe(4);
+    expect(movesOf(a(true, ['mate', 'mateIn2']))).toBe(2);
+    expect(movesOf(a(true, ['oneMove', 'fork']))).toBe(1);
+    expect(movesOf(a(true, ['mateIn5']))).toBeUndefined(); // "mate in 5 or more"
+    expect(movesOf(a(true, ['fork']))).toBeUndefined();
+  });
+
+  it('counts attempts and successes per move count', () => {
+    const attempts = [a(true, ['mate'], 2), a(false, ['fork'], 2), a(true, ['crushing'], 3), a(false, ['fork'])];
+    expect(lengthStats(attempts).get(2)).toEqual({ attempts: 2, solved: 1 });
+    expect(lengthStats(attempts).get(3)).toEqual({ attempts: 1, solved: 1 });
+    expect(lengthStats(attempts, true).get(2)).toEqual({ attempts: 1, solved: 1 });
+    expect(lengthStats(attempts, true).has(3)).toBe(false);
   });
 });

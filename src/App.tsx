@@ -11,6 +11,7 @@ import { Review } from './pages/Review';
 import { Rush } from './pages/Rush';
 import { SettingsPage } from './pages/Settings';
 import { Stats } from './pages/Stats';
+import { MoveCounts, MovePuzzles } from './pages/MovePuzzles';
 import { ThemePuzzles, Themes } from './pages/Themes';
 import { LearnHub } from './pages/learn/LearnHub';
 import { PvpLobby } from './pages/pvp/PvpLobby';
@@ -41,6 +42,8 @@ export function App() {
           <Route path="puzzles" element={<RatedPuzzles />} />
           <Route path="themes" element={<Themes />} />
           <Route path="themes/:theme" element={<ThemePuzzles />} />
+          <Route path="moves" element={<MoveCounts />} />
+          <Route path="moves/:n" element={<MovePuzzles />} />
           <Route path="rush" element={<Rush />} />
           <Route path="review" element={<Review />} />
           <Route path="daily" element={<Daily />} />

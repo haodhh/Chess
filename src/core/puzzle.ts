@@ -12,6 +12,16 @@ export interface Puzzle {
   themes: string[];
 }
 
+/** How many moves the solver has to find (the first move is the opponent's setup move). */
+export function solverMoves(puzzle: Pick<Puzzle, 'moves'>): number {
+  return Math.floor(puzzle.moves.length / 2);
+}
+
+/** Puzzles whose solution ends in checkmate. */
+export function isMatePuzzle(puzzle: Pick<Puzzle, 'themes'>): boolean {
+  return puzzle.themes.includes('mate');
+}
+
 export type MoveVerdict = 'wrong' | 'correct' | 'solved';
 
 /**
