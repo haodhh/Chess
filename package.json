@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc -p .",
-    "build:puzzles": "node scripts/build-puzzles.mjs"
+    "build:puzzles": "node scripts/build-puzzles.mjs",
+    "build:openings": "node scripts/build-openings.mjs"
   },
   "dependencies": {
     "@lichess-org/chessground": "^10.1.1",

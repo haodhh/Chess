@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { decayRd, updateGlicko } from '../core/glicko2';
 import type { Puzzle } from '../core/puzzle';
+import type { Card } from 'ts-fsrs';
 import { gradeFor, reviveCard, scheduleReview } from '../core/srs';
 import { db, type Attempt, type Profile, type PuzzleMode, type ReviewCard, type RushRun, type Settings } from './db';
 
@@ -157,41 +158,58 @@ export function useRushBest(): Record<string, number> | undefined {
 
 // ---------- Backup ----------
 
+const BACKUP_TABLES = [
+  'profile',
+  'attempts',
+  'reviews',
+  'rushRuns',
+  'games',
+  'drillResults',
+  'visionRuns',
+  'repertoire',
+  'lessons',
+] as const;
+
 interface Backup {
   app: 'chess-trainer';
-  version: 1;
+  version: number;
   exportedAt: string;
-  profile?: Profile;
-  attempts: Attempt[];
-  reviews: ReviewCard[];
-  rushRuns: RushRun[];
+  tables: Partial<Record<(typeof BACKUP_TABLES)[number], unknown[]>>;
 }
 
 export async function exportBackup(): Promise<string> {
-  const backup: Backup = {
-    app: 'chess-trainer',
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    profile: await db.profile.get('me'),
-    attempts: await db.attempts.toArray(),
-    reviews: await db.reviews.toArray(),
-    rushRuns: await db.rushRuns.toArray(),
-  };
+  const tables: Backup['tables'] = {};
+  for (const name of BACKUP_TABLES) tables[name] = await db.table(name).toArray();
+  const backup: Backup = { app: 'chess-trainer', version: 2, exportedAt: new Date().toISOString(), tables };
   return JSON.stringify(backup);
 }
 
+type LegacyBackup = { profile?: Profile; attempts?: Attempt[]; reviews?: ReviewCard[]; rushRuns?: RushRun[] };
+
 export async function importBackup(json: string) {
-  const data = JSON.parse(json) as Backup;
+  const data = JSON.parse(json) as Backup & LegacyBackup;
   if (data.app !== 'chess-trainer') throw new Error('File không phải bản sao lưu của ứng dụng này.');
-  await db.transaction('rw', db.profile, db.attempts, db.reviews, db.rushRuns, async () => {
-    await Promise.all([db.profile.clear(), db.attempts.clear(), db.reviews.clear(), db.rushRuns.clear()]);
-    if (data.profile) await db.profile.put(data.profile);
-    await db.attempts.bulkAdd(data.attempts);
-    await db.reviews.bulkAdd(data.reviews.map((r) => ({ ...r, card: reviveCard(r.card) })));
-    await db.rushRuns.bulkAdd(data.rushRuns);
+  // Version 1 backups stored the four puzzle tables at the top level.
+  const tables: Backup['tables'] = data.tables ?? {
+    profile: data.profile ? [data.profile] : [],
+    attempts: data.attempts ?? [],
+    reviews: data.reviews ?? [],
+    rushRuns: data.rushRuns ?? [],
+  };
+  const revive = (rows: unknown[]) =>
+    rows.map((r) => {
+      const row = r as { card?: Card };
+      return row.card ? { ...row, card: reviveCard(row.card) } : row;
+    });
+  await db.transaction('rw', BACKUP_TABLES.map((n) => db.table(n)), async () => {
+    for (const name of BACKUP_TABLES) {
+      await db.table(name).clear();
+      const rows = tables[name];
+      if (rows?.length) await db.table(name).bulkPut(revive(rows));
+    }
   });
 }
 
 export async function resetAll() {
-  await Promise.all([db.profile.clear(), db.attempts.clear(), db.reviews.clear(), db.rushRuns.clear()]);
+  await Promise.all(BACKUP_TABLES.map((n) => db.table(n).clear()));
 }

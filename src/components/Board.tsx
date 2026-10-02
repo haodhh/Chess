@@ -23,6 +23,10 @@ export interface BoardProps {
   syncKey?: number;
   isPromotion?: (orig: Key, dest: Key) => boolean;
   onMove?: (orig: Key, dest: Key, promotion?: Promotion) => void;
+  /** Called with the square under every click or touch, e.g. for coordinate training. */
+  onSelect?: (key: Key) => void;
+  /** Extra CSS classes per square, e.g. to highlight a target. */
+  highlights?: Map<Key, string>;
 }
 
 const PROMOTION_PIECES: { role: string; letter: Promotion }[] = [
@@ -53,14 +57,17 @@ export function Board(props: BoardProps) {
           },
         },
       },
+      coordinates: propsRef.current.coordinates ?? true,
       premovable: { enabled: false },
+      events: { select: (key) => propsRef.current.onSelect?.(key) },
       draggable: { showGhost: true },
       highlight: { lastMove: true, check: true },
     });
     return () => api.current?.destroy();
   }, []);
 
-  const { fen, orientation, turnColor, movable, dests, lastMove, check, coordinates, animation, syncKey } = props;
+  const { fen, orientation, turnColor, movable, dests, lastMove, check, coordinates, animation, syncKey, highlights } =
+    props;
   useEffect(() => {
     api.current?.set({
       fen,
@@ -69,12 +76,23 @@ export function Board(props: BoardProps) {
       lastMove,
       check: check ? turnColor : false,
       coordinates: coordinates ?? true,
+      highlight: { lastMove: true, check: true, custom: highlights ?? new Map() },
       animation: { enabled: animation ?? true, duration: 220 },
       movable: { color: movable, dests: movable ? dests : new Map() },
       viewOnly: false,
     });
     setPromotion(null);
-  }, [fen, orientation, turnColor, movable, dests, lastMove, check, coordinates, animation, syncKey]);
+  }, [fen, orientation, turnColor, movable, dests, lastMove, check, coordinates, animation, syncKey, highlights]);
+
+  // chessground only draws coordinates when it renders the board, so redraw when they change.
+  const shownCoords = useRef(props.coordinates ?? true);
+  useEffect(() => {
+    const want = coordinates ?? true;
+    if (api.current && shownCoords.current !== want) {
+      shownCoords.current = want;
+      api.current.redrawAll();
+    }
+  }, [coordinates]);
 
   useEffect(() => {
     api.current?.setAutoShapes(props.shapes ?? []);

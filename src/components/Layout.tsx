@@ -17,7 +17,7 @@ const NAV: NavItem[] = [
   { to: '/review', icon: '🔁', label: 'Ôn lỗi' },
   { to: '/daily', icon: '📅', label: 'Hằng ngày' },
   { to: '/stats', icon: '📈', label: 'Thống kê' },
-  { to: '/train', icon: '🏋️', label: 'Luyện tập', soon: true },
+  { to: '/train', icon: '🏋️', label: 'Luyện tập' },
   { to: '/learn', icon: '🎓', label: 'Học', soon: true },
   { to: '/settings', icon: '⚙️', label: 'Cài đặt' },
 ];
@@ -40,7 +40,7 @@ export function Layout() {
     }`;
 
   const items = NAV.map((item) => (
-    <NavLink key={item.to} to={item.to} end={item.to === '/'} className={linkClass}>
+    <NavLink key={item.to} to={item.to} end={item.to === '/' || item.to === '/puzzles'} className={linkClass}>
       <span className="text-lg leading-none">{item.icon}</span>
       <span>{item.label}</span>
       {item.to === '/review' && due > 0 && (

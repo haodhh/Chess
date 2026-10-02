@@ -87,6 +87,7 @@ export const THEMES: Record<string, ThemeInfo> = {
   veryLong: { name: 'Rất dài (4+ nước)' },
 
   // Nguồn
+  ownGame: { name: 'Từ ván của bạn', desc: 'Thế cờ bạn đã đi sai trong ván của chính mình.' },
   master: { name: 'Ván của kiện tướng' },
   masterVsMaster: { name: 'Kiện tướng đấu kiện tướng' },
   superGM: { name: 'Ván siêu đại kiện tướng' },
@@ -129,6 +130,7 @@ export function themeName(theme: string): string {
 
 /** Themes that describe the puzzle's length or origin rather than a skill; hidden from weakness stats. */
 export const NON_SKILL_THEMES = new Set([
+  'ownGame',
   'oneMove', 'short', 'long', 'veryLong', 'master', 'masterVsMaster', 'superGM', 'crushing',
   'advantage', 'mate', 'middlegame',
 ]);

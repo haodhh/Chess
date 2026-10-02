@@ -12,6 +12,13 @@ import { Rush } from './pages/Rush';
 import { SettingsPage } from './pages/Settings';
 import { Stats } from './pages/Stats';
 import { ThemePuzzles, Themes } from './pages/Themes';
+import { Analysis } from './pages/train/Analysis';
+import { DrillPage, Drills } from './pages/train/Drills';
+import { GameReview } from './pages/train/GameReview';
+import { Games } from './pages/train/Games';
+import { Play } from './pages/train/Play';
+import { TrainHub } from './pages/train/TrainHub';
+import { Vision } from './pages/train/Vision';
 
 export function App() {
   const profile = useProfile();
@@ -32,7 +39,14 @@ export function App() {
           <Route path="daily" element={<Daily />} />
           <Route path="stats" element={<Stats />} />
           <Route path="settings" element={<SettingsPage />} />
-          <Route path="train" element={<ComingSoon section="train" />} />
+          <Route path="train" element={<TrainHub />} />
+          <Route path="train/play" element={<Play />} />
+          <Route path="train/games" element={<Games />} />
+          <Route path="train/review/:id" element={<GameReview />} />
+          <Route path="train/drills" element={<Drills />} />
+          <Route path="train/drills/:id" element={<DrillPage />} />
+          <Route path="train/vision" element={<Vision />} />
+          <Route path="train/analysis" element={<Analysis />} />
           <Route path="learn" element={<ComingSoon section="learn" />} />
           <Route path="*" element={<Home />} />
         </Route>
