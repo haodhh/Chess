@@ -151,9 +151,9 @@ export function SettingsPage() {
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3">
+    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3">
       <span>{label}</span>
-      <input type="checkbox" className="h-5 w-5 accent-[#81b64c]" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <input type="checkbox" className="h-6 w-6 accent-[#81b64c]" checked={checked} onChange={(e) => onChange(e.target.checked)} />
     </label>
   );
 }

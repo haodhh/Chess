@@ -192,8 +192,8 @@ export function GameReview() {
   for (const r of reviews ?? []) if (r.cls === 'mistake' || r.cls === 'blunder') graphMarks.set(r.ply + 1, CLASS_INFO[r.cls].color);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-      <div className="mx-auto flex w-full max-w-[min(100%,calc(100vh-150px))] flex-col gap-2">
+    <div className="game-layout">
+      <div className="board-col flex flex-col gap-2">
         <div className="flex gap-2">
           <EvalBar score={whiteEval} orientation={userColor} />
           <div className="flex-1">
@@ -255,7 +255,7 @@ export function GameReview() {
         </div>
 
         {retry ? (
-          <div className={`card ${retry.ok ? 'bg-good/20' : ''}`}>
+          <div className={`card -order-1 lg:order-none ${retry.ok ? 'bg-good/20' : ''}`}>
             <div className="font-bold">🔁 Thử lại nước {Math.floor(retry.ply / 2) + 1}</div>
             <p className="text-sm text-muted">
               {retry.message ?? `Bạn đã đi ${parsed.moves[retry.ply].san}. Hãy tìm nước tốt hơn.`}
@@ -286,7 +286,7 @@ export function GameReview() {
         ) : (
           review &&
           move && (
-            <div className="card">
+            <div className="card -order-1 lg:order-none">
               <div className="flex items-center gap-2">
                 <span className="rounded px-2 py-0.5 text-sm font-bold text-black" style={{ background: CLASS_INFO[review.cls].color }}>
                   {CLASS_INFO[review.cls].icon}
@@ -371,7 +371,8 @@ export function GameReview() {
           }}
           firstPly={new Chess(parsed.startFen).turn() === 'b' ? 1 : 0}
         />
-        <div className="grid grid-cols-4 gap-2">
+        {/* On phones the navigation sits right under the board. */}
+        <div className="-order-2 grid grid-cols-4 gap-2 lg:order-none">
           <button className="btn btn-sm py-2" onClick={() => setPly(-1)}>⏮</button>
           <button className="btn btn-sm py-2" onClick={() => setPly((p) => Math.max(-1, p - 1))}>◀</button>
           <button className="btn btn-sm py-2" onClick={() => setPly((p) => Math.min(parsed.moves.length - 1, p + 1))}>▶</button>

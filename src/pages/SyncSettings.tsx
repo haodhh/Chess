@@ -71,11 +71,11 @@ export function SyncSettings() {
                     ? `✓ Đồng bộ lần cuối ${timeAgo(s.lastSyncAt, now)}${s.dirty ? ' · có thay đổi chờ lưu' : ''}`
                     : 'Chưa đồng bộ lần nào.'}
             </div>
-            <label className="flex cursor-pointer items-center justify-between gap-3">
+            <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3">
               <span>Tự động đồng bộ khi có thay đổi</span>
               <input
                 type="checkbox"
-                className="h-5 w-5 accent-[#81b64c]"
+                className="h-6 w-6 accent-[#81b64c]"
                 checked={s.config.auto}
                 onChange={(e) => setAutoSync(e.target.checked)}
               />

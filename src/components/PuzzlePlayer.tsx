@@ -177,8 +177,8 @@ export function PuzzlePlayer({ puzzle, settings, rush, onResult, onFinished, onN
   const success = status === 'solved' && !hadMistake.current && !usedHint.current;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]" data-puzzle-id={puzzle.id}>
-      <div className="mx-auto w-full max-w-[min(100%,calc(100vh-150px))]">
+    <div className="game-layout" data-puzzle-id={puzzle.id}>
+      <div className="board-col">
         <Board
           fen={fen}
           orientation={session.solverColor}
@@ -197,8 +197,9 @@ export function PuzzlePlayer({ puzzle, settings, rush, onResult, onFinished, onN
         />
       </div>
 
-      <aside className="flex flex-col gap-3">
-        {header}
+      {/* On phones the status and buttons come right under the board; extras follow. */}
+      <aside>
+        {header && <div className={`flex flex-col gap-3 ${rush ? '' : 'order-1 lg:order-none'}`}>{header}</div>}
         <StatusCard status={status} solver={solver} success={success} rush={rush} />
 
         {!rush && !finished && (
@@ -212,18 +213,18 @@ export function PuzzlePlayer({ puzzle, settings, rush, onResult, onFinished, onN
           </div>
         )}
 
+        {finished && !rush && onNext && (
+          <button className="btn btn-primary text-lg" onClick={onNext} autoFocus>
+            {nextLabel ?? 'Puzzle tiếp theo →'}
+          </button>
+        )}
         {finished && !rush && (
-          <>
-            {onNext && (
-              <button className="btn btn-primary text-lg" onClick={onNext} autoFocus>
-                {nextLabel ?? 'Puzzle tiếp theo →'}
-              </button>
-            )}
+          <div className="order-2 flex flex-col gap-3 lg:order-none">
             <MoveList line={line} current={viewPly ?? line.length - 1} onSelect={setViewPly} />
             <PuzzleMeta puzzle={puzzle} fen={fen} />
-          </>
+          </div>
         )}
-        {footer}
+        {footer && <div className="order-3 flex flex-col gap-3 lg:order-none">{footer}</div>}
       </aside>
     </div>
   );
@@ -255,7 +256,7 @@ function StatusCard({ status, solver, success, rush }: { status: Status; solver:
   };
   const c = content[status];
   return (
-    <div className={`rounded-xl border border-transparent p-4 ${c.tone}`}>
+    <div className={`rounded-xl border border-transparent p-3 sm:p-4 ${c.tone}`}>
       <div className="flex items-center gap-3">
         <span className="text-3xl leading-none">{c.icon}</span>
         <div>
@@ -290,7 +291,7 @@ function MoveList({ line, current, onSelect }: { line: LinePosition[]; current: 
           <button
             key={i}
             onClick={() => onSelect(i)}
-            className={`rounded px-1.5 py-0.5 ${i === current ? 'bg-accent text-black' : 'hover:bg-white/10'} ${i === 0 ? 'opacity-60' : ''}`}
+            className={`rounded px-2 py-1.5 lg:px-1.5 lg:py-0.5 ${i === current ? 'bg-accent text-black' : 'hover:bg-white/10'} ${i === 0 ? 'opacity-60' : ''}`}
             title={i === 0 ? 'Nước của đối thủ trước khi bắt đầu' : undefined}
           >
             {p.move?.san}

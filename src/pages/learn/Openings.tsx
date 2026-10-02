@@ -92,8 +92,8 @@ export function Openings() {
   };
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-      <div className="mx-auto w-full max-w-[min(100%,calc(100vh-150px))]">
+    <div className="game-layout">
+      <div className="board-col">
         <Board
           fen={fen}
           orientation={orientation}
@@ -140,7 +140,7 @@ export function Openings() {
           <div className="mb-2 font-semibold">{node ? 'Các tiếp diễn có tên' : 'Đã ra khỏi lý thuyết khai cuộc'}</div>
           <div className="flex max-h-64 flex-col gap-1 overflow-y-auto">
             {continuations.map((c) => (
-              <button key={c.uci} className="flex items-center gap-2 rounded px-2 py-1 text-left text-sm hover:bg-white/10" onClick={() => play(c.uci)}>
+              <button key={c.uci} className="flex min-w-0 items-center gap-2 rounded px-2 py-2.5 text-left text-sm hover:bg-white/10 lg:py-1" onClick={() => play(c.uci)}>
                 <b className="w-14 shrink-0 font-mono">{c.san}</b>
                 <span className="flex-1 truncate text-muted">{c.name}</span>
                 <span className="text-xs text-muted">{c.lines}</span>
@@ -178,7 +178,7 @@ export function Openings() {
                 o && (
                   <button
                     key={o.eco + o.name}
-                    className="flex gap-2 rounded px-2 py-1 text-left text-sm hover:bg-white/10"
+                    className="flex min-w-0 gap-2 rounded px-2 py-2.5 text-left text-sm hover:bg-white/10 lg:py-1"
                     onClick={() => {
                       setMoves(o.uci);
                       setQuery('');

@@ -62,17 +62,18 @@ export function Play() {
           </button>
         </div>
       )}
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-2">
         {BOT_LEVELS.map((b) => (
           <button
             key={b.id}
             onClick={() => setLevel(b)}
-            className={`card flex items-center gap-3 text-left transition-colors ${level.id === b.id ? 'ring-2 ring-accent' : 'hover:bg-panel-2'}`}
+            className={`card flex items-center gap-2 !p-3 text-left transition-colors sm:gap-3 sm:!p-4 ${level.id === b.id ? 'ring-2 ring-accent' : 'hover:bg-panel-2'}`}
           >
-            <span className="text-4xl">{b.avatar}</span>
-            <span className="flex-1">
-              <span className="font-bold">{b.name}</span> <span className="text-accent">{b.id === 'max' ? 'Tối đa' : b.elo}</span>
-              <span className="block text-sm text-muted">{b.desc}</span>
+            <span className="text-3xl sm:text-4xl">{b.avatar}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-bold leading-tight sm:inline">{b.name}</span>{' '}
+              <span className="text-sm text-accent">{b.id === 'max' ? 'Tối đa' : b.elo}</span>
+              <span className="hidden text-sm text-muted sm:block">{b.desc}</span>
             </span>
           </button>
         ))}
@@ -166,8 +167,8 @@ function BotGame({
   const outcome = over && (over.winner === null ? 'Hòa' : over.winner === userColor ? 'Bạn thắng! 🎉' : 'Bạn thua');
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <div className="mx-auto w-full max-w-[min(100%,calc(100vh-150px))]">
+    <div className="game-layout">
+      <div className="board-col">
         <Board
           fen={fen}
           orientation={orientation}

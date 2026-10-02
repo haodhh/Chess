@@ -53,7 +53,7 @@ function JoinRoom({ code, onJoined }: { code: string; onJoined: (token: string) 
 
   return (
     <div className="mx-auto max-w-md">
-      <Link to="/pvp" className="link mb-3 inline-block text-sm">
+      <Link to="/pvp" className="back-link mb-1">
         ← Sảnh chơi online
       </Link>
       <div className="card flex flex-col gap-3">
@@ -268,9 +268,9 @@ function RoomGame({ code, token }: { code: string; token: string }) {
     (room.result.winner === null ? 'Hòa' : room.result.winner === you ? 'Bạn thắng! 🎉' : 'Bạn thua');
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <div className="mx-auto flex w-full max-w-[min(100%,calc(100vh-190px))] flex-col gap-2">
-        {playerBar(opp)}
+    <div className="game-layout">
+      <div className="board-col board-col-bars flex flex-col gap-2">
+        <div className="short:hidden">{playerBar(opp)}</div>
         <Board
           fen={chess.fen()}
           orientation={you}
@@ -291,10 +291,15 @@ function RoomGame({ code, token }: { code: string; token: string }) {
             send({ t: 'move', uci, game: room.game });
           }}
         />
-        {playerBar(you)}
+        <div className="short:hidden">{playerBar(you)}</div>
       </div>
 
       <aside className="flex flex-col gap-3">
+        {/* Sideways phones: the board fills the height, so the clocks move here. */}
+        <div className="-order-2 hidden flex-col gap-2 short:flex">
+          {playerBar(opp)}
+          {playerBar(you)}
+        </div>
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
@@ -309,7 +314,7 @@ function RoomGame({ code, token }: { code: string; token: string }) {
         </div>
 
         {room.status === 'waiting' && (
-          <div className="card flex flex-col gap-2 border border-accent/50">
+          <div className="card -order-1 flex flex-col gap-2 border border-accent/50 lg:order-none">
             <div className="text-lg font-bold">⏳ Đang chờ đối thủ…</div>
             <p className="text-sm text-muted">
               Gửi cho bạn bè mã phòng <b className="font-mono text-white">{code}</b>
@@ -330,10 +335,10 @@ function RoomGame({ code, token }: { code: string; token: string }) {
           </div>
         )}
 
-        {error && <div className="card text-sm text-warn">{error}</div>}
+        {error && <div className="card -order-1 text-sm text-warn lg:order-none">{error}</div>}
 
         {room.status === 'playing' && (
-          <div className="card text-sm">
+          <div className="card -order-1 text-sm lg:order-none">
             {myTurn ? <b className="text-good">Đến lượt bạn</b> : <span className="text-muted">Đối thủ đang nghĩ…</span>}
             {room.drawOffer === opp && (
               <div className="mt-3 rounded-lg bg-white/5 p-2">
@@ -370,7 +375,7 @@ function RoomGame({ code, token }: { code: string; token: string }) {
         )}
 
         {room.status === 'finished' && room.result && (
-          <div className={`card text-center ${room.result.winner === you ? 'bg-good/20' : room.result.winner ? 'bg-bad/20' : ''}`}>
+          <div className={`card -order-1 text-center lg:order-none ${room.result.winner === you ? 'bg-good/20' : room.result.winner ? 'bg-bad/20' : ''}`}>
             <div className="text-2xl font-extrabold">{resultText}</div>
             <div className="text-sm text-muted">{room.result.reason}</div>
             <div className="mt-3 grid grid-cols-2 gap-2">
@@ -390,7 +395,7 @@ function RoomGame({ code, token }: { code: string; token: string }) {
         )}
 
         <MoveTable moves={history.map((m) => ({ san: m.san }))} current={history.length - 1} />
-        <Link to="/pvp" className="link text-sm">
+        <Link to="/pvp" className="back-link">
           ← Sảnh chơi online
         </Link>
       </aside>

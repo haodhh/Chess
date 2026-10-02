@@ -24,8 +24,15 @@ export function MoveTable({
   firstMoveNumber?: number;
 }) {
   const box = useRef<HTMLDivElement>(null);
+  // Keep the current move visible by scrolling the list only (scrollIntoView would also scroll the page on phones).
   useEffect(() => {
-    box.current?.querySelector('[data-current="true"]')?.scrollIntoView({ block: 'nearest' });
+    const list = box.current;
+    const el = list?.querySelector('[data-current="true"]');
+    if (!list || !el) return;
+    const l = list.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    if (r.top < l.top) list.scrollTop += r.top - l.top;
+    else if (r.bottom > l.bottom) list.scrollTop += r.bottom - l.bottom;
   }, [current, moves.length]);
 
   const rows: { num: number; cells: (number | null)[] }[] = [];
@@ -48,7 +55,7 @@ export function MoveTable({
                 key={j}
                 data-current={idx === current}
                 onClick={() => onSelect?.(idx)}
-                className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-left ${idx === current ? 'bg-accent text-black' : 'hover:bg-white/10'} ${onSelect ? '' : 'cursor-default'}`}
+                className={`flex items-center gap-1 rounded px-1.5 py-1.5 text-left lg:py-0.5 ${idx === current ? 'bg-accent text-black' : 'hover:bg-white/10'} ${onSelect ? '' : 'cursor-default'}`}
               >
                 {moves[idx].san}
                 {moves[idx].mark && (

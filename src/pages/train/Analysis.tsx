@@ -133,8 +133,8 @@ export function Analysis() {
       : null;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="mx-auto flex w-full max-w-[min(100%,calc(100vh-150px))] gap-2">
+    <div className="game-layout">
+      <div className="board-col flex gap-2">
         {engineOn && <EvalBar score={evalScore} orientation={orientation} />}
         <div className="flex-1">
           <Board
@@ -159,8 +159,8 @@ export function Analysis() {
         <div className="card">
           <div className="mb-2 flex items-center justify-between">
             <h1 className="text-lg font-bold">🔍 Bàn phân tích</h1>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" className="accent-[#81b64c]" checked={engineOn} onChange={(e) => setEngineOn(e.target.checked)} />
+            <label className="flex min-h-9 cursor-pointer items-center gap-2 text-sm">
+              <input type="checkbox" className="h-6 w-6 accent-[#81b64c]" checked={engineOn} onChange={(e) => setEngineOn(e.target.checked)} />
               Stockfish
             </label>
           </div>
@@ -171,7 +171,7 @@ export function Analysis() {
               {lines.map((l) => (
                 <button
                   key={l.multipv}
-                  className="flex gap-2 rounded px-1 py-0.5 text-left hover:bg-white/10"
+                  className="flex gap-2 rounded px-1 py-2 text-left hover:bg-white/10 lg:py-0.5"
                   onClick={() => l.pv[0] && play(l.pv[0])}
                   title="Bấm để đi nước này"
                 >
@@ -190,7 +190,7 @@ export function Analysis() {
           firstPly={new Chess(startFen).turn() === 'b' ? 1 : 0}
           firstMoveNumber={Number(startFen.split(' ')[5] ?? 1)}
         />
-        <div className="grid grid-cols-4 gap-2">
+        <div className="-order-1 grid grid-cols-4 gap-2 lg:order-none">
           <button className="btn btn-sm py-2" onClick={() => setCursor(-1)} aria-label="Về đầu">⏮</button>
           <button className="btn btn-sm py-2" onClick={() => setCursor((c) => Math.max(-1, c - 1))} aria-label="Lùi">◀</button>
           <button className="btn btn-sm py-2" onClick={() => setCursor((c) => Math.min(moves.length - 1, c + 1))} aria-label="Tiến">▶</button>

@@ -28,15 +28,15 @@ export function TrainHub() {
     <div className="mx-auto max-w-4xl">
       <h1 className="mb-1 text-2xl font-extrabold">🏋️ Luyện tập</h1>
       <p className="mb-5 text-muted">Chơi, phân tích và luyện lại các tình huống. Engine Stockfish chạy ngay trong trình duyệt của bạn.</p>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {items.map((i) => (
-          <Link key={i.to} to={i.to} className="card block transition-colors hover:bg-panel-2">
+          <Link key={i.to} to={i.to} className="card block !p-3 transition-colors hover:bg-panel-2 sm:!p-4">
             <div className="flex items-start justify-between">
               <span className="text-3xl">{i.icon}</span>
-              {i.badge && <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs">{i.badge}</span>}
+              {i.badge && <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] sm:text-xs">{i.badge}</span>}
             </div>
-            <div className="mt-2 text-lg font-bold">{i.title}</div>
-            <div className="text-sm text-muted">{i.desc}</div>
+            <div className="mt-2 leading-tight font-bold sm:text-lg">{i.title}</div>
+            <div className="mt-0.5 text-xs text-muted sm:text-sm">{i.desc}</div>
           </Link>
         ))}
       </div>

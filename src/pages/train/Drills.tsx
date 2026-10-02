@@ -158,8 +158,8 @@ function DrillRun({ drill, onRetry }: { drill: Drill; onRetry: () => void }) {
   const best = results?.get(drill.id);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <div className="mx-auto w-full max-w-[min(100%,calc(100vh-150px))]">
+    <div className="game-layout">
+      <div className="board-col">
         <Board
           fen={fen}
           orientation={userColor}
@@ -179,7 +179,7 @@ function DrillRun({ drill, onRetry }: { drill: Drill; onRetry: () => void }) {
         />
       </div>
       <aside className="flex flex-col gap-3">
-        <Link to="/train/drills" className="link text-sm">
+        <Link to="/train/drills" className="back-link">
           ← Tất cả drills
         </Link>
         <div className="card">

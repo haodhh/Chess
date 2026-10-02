@@ -3,6 +3,9 @@
 @import '@lichess-org/chessground/assets/chessground.brown.css';
 @import '@lichess-org/chessground/assets/chessground.cburnett.css';
 
+/* Phones held sideways: little height, so the board goes beside the panel. */
+@custom-variant short (@media (orientation: landscape) and (max-height: 520px));
+
 @theme {
   --color-bg: #262421;
   --color-panel: #312e2b;
@@ -21,6 +24,28 @@ body {
   background: var(--color-bg);
   color: #f5f5f4;
   -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* iOS zooms into inputs smaller than 16px when they get focus. */
+@media (max-width: 1023px) {
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Sideways phones: board and panel side by side, board as tall as the screen allows. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .game-layout {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+  .board-col {
+    width: calc(100dvh - 64px);
+    max-width: none;
+  }
 }
 
 @layer components {
@@ -31,7 +56,24 @@ body {
     @apply bg-accent text-white shadow-[0_4px_0_0_var(--color-accent-dark)] hover:bg-[#95c95e] active:translate-y-0.5 active:shadow-none;
   }
   .btn-sm {
-    @apply px-2 py-1 text-xs;
+    @apply min-h-9 min-w-9 px-3 py-1 text-xs;
+  }
+  /* "← Back" links: easy to tap on phones. */
+  .back-link {
+    @apply inline-flex min-h-9 items-center text-sm text-accent hover:underline;
+  }
+  /* Board pages: board on top on phones, beside the panel on desktops and sideways phones. */
+  .game-layout {
+    @apply grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_360px];
+  }
+  .game-layout > aside {
+    @apply flex min-w-0 flex-col gap-3;
+  }
+  .board-col {
+    @apply mx-auto w-full max-w-[min(100%,calc(100dvh-140px))] min-w-0;
+  }
+  .board-col-bars {
+    @apply max-w-[min(100%,calc(100dvh-230px))];
   }
   .card {
     @apply rounded-xl bg-panel p-4;

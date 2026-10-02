@@ -59,10 +59,11 @@ function LessonRun({ lesson }: { lesson: Lesson }) {
 
   const panelTop = (
     <>
-      <Link to="/learn" className="link text-sm">
+      {/* On phones the step text and buttons come first, right under the board. */}
+      <Link to="/learn" className="back-link order-last lg:order-none">
         ← Lộ trình học
       </Link>
-      <div className="card">
+      <div className="card order-1 lg:order-none">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{lesson.icon}</span>
           <h1 className="text-lg font-bold">{lesson.title}</h1>
@@ -135,8 +136,8 @@ function LessonRun({ lesson }: { lesson: Lesson }) {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="mx-auto w-full max-w-[min(100%,calc(100vh-150px))]">
+    <div className="game-layout">
+      <div className="board-col">
         <StepBoard key={index} step={step} settings={settings} onDone={markDone} onMistake={addMistake} />
       </div>
       <aside className="flex flex-col gap-3">

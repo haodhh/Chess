@@ -37,8 +37,8 @@ export function RepertoirePage() {
   if (training) {
     const { line } = training;
     return (
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="mx-auto w-full max-w-[min(100%,calc(100vh-150px))]">
+      <div className="game-layout">
+        <div className="board-col">
           <LineTrainer
             key={training.round}
             fen={START}

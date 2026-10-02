@@ -36,18 +36,18 @@ export function Themes() {
       {THEME_GROUPS.map((group) => (
         <section key={group.title} className="mb-6">
           <h2 className="mb-3 text-lg font-bold">{group.title}</h2>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
             {group.themes
               .filter((t) => !index || (index.themeCounts[t] ?? 0) > 0)
               .map((t) => {
                 const s = stats.get(t);
                 return (
-                  <Link key={t} to={`/themes/${t}`} className="card block transition-colors hover:bg-panel-2">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="font-semibold">{themeName(t)}</span>
+                  <Link key={t} to={`/themes/${t}`} className="card block !p-3 transition-colors hover:bg-panel-2 sm:!p-4">
+                    <div className="flex flex-col justify-between gap-x-2 sm:flex-row sm:items-baseline">
+                      <span className="text-sm leading-tight font-semibold sm:text-base">{themeName(t)}</span>
                       {index && <span className="text-xs text-muted">{index.themeCounts[t]} bài</span>}
                     </div>
-                    {THEMES[t]?.desc && <p className="mt-1 text-xs text-muted">{THEMES[t].desc}</p>}
+                    {THEMES[t]?.desc && <p className="mt-1 hidden text-xs text-muted sm:block">{THEMES[t].desc}</p>}
                     {s && (
                       <div className="mt-2 flex items-center gap-2 text-xs">
                         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
@@ -72,7 +72,7 @@ export function ThemePuzzles() {
   const { theme = '' } = useParams();
   return (
     <div>
-      <Link to="/themes" className="link mb-3 inline-block text-sm">
+      <Link to="/themes" className="back-link mb-1">
         ← Tất cả chủ đề
       </Link>
       <PuzzleTrainer key={theme} mode="theme" theme={theme} />

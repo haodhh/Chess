@@ -54,7 +54,7 @@ export function Home() {
         🧩 Giải puzzle
       </Link>
 
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
         <Tile to="/review" icon="🔁" title="Ôn lỗi" desc={due > 0 ? `${due} bài đến hạn ôn` : 'Không có bài đến hạn'} highlight={due > 0} />
         <Tile to="/rush" icon="⚡" title="Puzzle Rush" desc="Giải nhanh trong 3 hoặc 5 phút" />
         <Tile to="/daily" icon="📅" title="Puzzle hằng ngày" desc="Mỗi ngày một bài" />
@@ -68,7 +68,7 @@ export function Home() {
 
       <section>
         <h2 className="mb-3 text-lg font-bold">Luyện tập & Học</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-5">
           <Tile to="/train/play" icon="🤖" title="Chơi với máy" desc="7 mức độ, có gợi ý" />
           <Tile to="/train/games" icon="📚" title="Phân tích ván" desc="Tìm lỗi trong ván của bạn" />
           <Tile to="/train/drills" icon="🏁" title="Drills" desc="Chiếu hết & tàn cuộc kinh điển" />
@@ -84,11 +84,11 @@ function Tile(props: { to: string; icon: string; title: string; desc: string; hi
   return (
     <Link
       to={props.to}
-      className={`card block transition-colors hover:bg-panel-2 ${props.highlight ? 'border border-bad/60' : ''} ${props.muted ? 'opacity-60' : ''}`}
+      className={`card block !p-3 transition-colors hover:bg-panel-2 sm:!p-4 ${props.highlight ? 'border border-bad/60' : ''} ${props.muted ? 'opacity-60' : ''}`}
     >
       <div className="text-2xl">{props.icon}</div>
-      <div className="mt-1 font-bold">{props.title}</div>
-      <div className="text-sm text-muted">{props.desc}</div>
+      <div className="mt-1 text-sm leading-tight font-bold sm:text-base">{props.title}</div>
+      <div className="mt-0.5 text-xs text-muted sm:text-sm">{props.desc}</div>
     </Link>
   );
 }

@@ -98,8 +98,8 @@ export function Vision() {
   const bestKey = `${mode}-${colorChoice === 'random' ? color : colorChoice}`;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <div className="mx-auto w-full max-w-[min(100%,calc(100vh-150px))]">
+    <div className="game-layout">
+      <div className="board-col">
         <div className="relative">
           <Board
             fen={EMPTY}

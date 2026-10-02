@@ -63,7 +63,7 @@ export function Stats() {
         />
         <Stat label="Chuỗi ngày" value={`${streakDays(attempts)} 🔥`} />
         <Stat label="Kỷ lục Rush 3 phút" value={best?.['3m'] ?? 0} sub={`5 phút: ${best?.['5m'] ?? 0} · Sống sót: ${best?.survival ?? 0}`} />
-        <Stat label="Cần ôn" value={due ?? 0} sub={<Link className="link" to="/review">Ôn ngay</Link>} />
+        <Stat label="Cần ôn" value={due ?? 0} sub={<Link className="link inline-block py-2" to="/review">Ôn ngay</Link>} />
       </div>
 
       <div className="card">
