@@ -9,6 +9,7 @@ import { playSound } from '../core/sound';
 import { themeName } from '../core/themes';
 import type { Settings } from '../data/db';
 import { Board } from './Board';
+import { PieceIcon } from './PieceIcon';
 
 export interface PuzzleOutcome {
   success: boolean;
@@ -200,7 +201,7 @@ export function PuzzlePlayer({ puzzle, settings, rush, onResult, onFinished, onN
       {/* On phones the status and buttons come right under the board; extras follow. */}
       <aside>
         {header && <div className={`flex flex-col gap-3 ${rush ? '' : 'order-1 lg:order-none'}`}>{header}</div>}
-        <StatusCard status={status} solver={solver} success={success} rush={rush} />
+        <StatusCard status={status} solver={solver} solverColor={session.solverColor} success={success} rush={rush} />
 
         {!rush && !finished && (
           <div className="grid grid-cols-2 gap-2">
@@ -240,10 +241,22 @@ function buildLine(puzzle: Puzzle): LinePosition[] {
   return line;
 }
 
-function StatusCard({ status, solver, success, rush }: { status: Status; solver: string; success: boolean; rush?: boolean }) {
-  const content: Record<Status, { icon: string; title: string; text?: string; tone: string }> = {
+function StatusCard({
+  status,
+  solver,
+  solverColor,
+  success,
+  rush,
+}: {
+  status: Status;
+  solver: string;
+  solverColor: 'white' | 'black';
+  success: boolean;
+  rush?: boolean;
+}) {
+  const content: Record<Status, { icon: ReactNode; title: string; text?: string; tone: string }> = {
     setup: { icon: '⏳', title: 'Đối thủ đang đi…', tone: 'bg-panel' },
-    play: { icon: '♟', title: `Bạn cầm quân ${solver}`, text: 'Tìm nước đi tốt nhất.', tone: 'bg-panel' },
+    play: { icon: <PieceIcon color={solverColor} className="h-9 w-9" />, title: `Bạn cầm quân ${solver}`, text: 'Tìm nước đi tốt nhất.', tone: 'bg-panel' },
     correct: { icon: '✓', title: 'Chính xác!', text: 'Tiếp tục…', tone: 'bg-good/20 border-good' },
     wrong: { icon: '✗', title: 'Chưa đúng', text: 'Thử nước khác nhé.', tone: 'bg-bad/20 border-bad' },
     revealing: { icon: '👁', title: 'Đang hiện lời giải…', tone: 'bg-panel' },

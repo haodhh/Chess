@@ -7,9 +7,11 @@ import type { PositionEval } from '../engine/review';
 export type PuzzleMode = 'rated' | 'theme' | 'moves' | 'rush' | 'review' | 'daily';
 export type RushMode = '3m' | '5m' | 'survival';
 export type BoardTheme = 'green' | 'brown' | 'blue' | 'purple';
+export type PieceSet = 'cardinal' | 'merida' | 'maestro' | 'fresca' | 'chessnut' | 'cburnett';
 
 export interface Settings {
   boardTheme: BoardTheme;
+  pieceSet: PieceSet;
   sound: boolean;
   coordinates: boolean;
   animation: boolean;

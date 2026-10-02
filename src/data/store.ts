@@ -12,6 +12,7 @@ const DAY = 24 * 3600_000;
 
 export const DEFAULT_SETTINGS: Settings = {
   boardTheme: 'green',
+  pieceSet: 'cardinal',
   sound: true,
   coordinates: true,
   animation: true,

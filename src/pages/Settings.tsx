@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { PIECE_SETS, pieceUrl } from '../components/pieceSet';
 import type { BoardTheme } from '../data/db';
 import { useSyncState } from '../data/sync';
 import { SyncSettings } from './SyncSettings';
@@ -20,6 +21,8 @@ export function SettingsPage() {
   const [message, setMessage] = useState<string | null>(null);
   if (!profile) return null;
   const s = profile.settings;
+  const boardTheme = BOARD_THEMES.find((t) => t.id === s.boardTheme) ?? BOARD_THEMES[0];
+  const pieceSet = PIECE_SETS.find((p) => p.id === s.pieceSet);
 
   const download = async () => {
     const blob = new Blob([await exportBackup()], { type: 'application/json' });
@@ -60,6 +63,43 @@ export function SettingsPage() {
             </button>
           ))}
         </div>
+        <h2 className="mt-5 mb-3 font-semibold">Bộ quân cờ</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {PIECE_SETS.map((set) => (
+            <button
+              key={set.id}
+              onClick={() => updateSettings({ pieceSet: set.id })}
+              aria-pressed={s.pieceSet === set.id}
+              className={`rounded-lg p-2 text-sm ${s.pieceSet === set.id ? 'bg-accent/30 ring-2 ring-accent' : 'bg-panel-2'}`}
+            >
+              <div className="mx-auto mb-1 grid max-w-36 grid-cols-4 overflow-hidden rounded">
+                {(
+                  [
+                    ['white', 'king'],
+                    ['black', 'queen'],
+                    ['white', 'knight'],
+                    ['black', 'pawn'],
+                  ] as const
+                ).map(([color, role], i) => (
+                  <img
+                    key={i}
+                    src={pieceUrl(set.id, color, role)}
+                    alt=""
+                    draggable={false}
+                    className="aspect-square w-full"
+                    style={{ background: i % 2 ? boardTheme.dark : boardTheme.light }}
+                  />
+                ))}
+              </div>
+              {set.name}
+            </button>
+          ))}
+        </div>
+        {pieceSet && (
+          <p className="mt-2 text-xs text-muted">
+            Bộ {pieceSet.name}: {pieceSet.author}, giấy phép {pieceSet.license} (lấy từ Lichess).
+          </p>
+        )}
         <div className="mt-4 flex flex-col gap-2">
           <Toggle label="Hiện tọa độ" checked={s.coordinates} onChange={(v) => updateSettings({ coordinates: v })} />
           <Toggle label="Hiệu ứng di chuyển quân" checked={s.animation} onChange={(v) => updateSettings({ animation: v })} />

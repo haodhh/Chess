@@ -8,6 +8,7 @@ import type { Repertoire } from '../../data/db';
 import { deleteRepertoireLine, gradeRepertoireLine, useRepertoire } from '../../data/learn';
 import { useProfile } from '../../data/store';
 import { formatDue } from '../Review';
+import { PieceIcon } from '../../components/PieceIcon';
 
 const START = new Chess().fen();
 
@@ -102,7 +103,7 @@ export function RepertoirePage() {
           <div className="divide-y divide-white/5">
             {lines.map((l) => (
               <div key={l.id} className="flex flex-wrap items-center gap-3 py-2 text-sm">
-                <span className="text-lg">{l.color === 'white' ? '♔' : '♚'}</span>
+                <PieceIcon color={l.color} className="h-7 w-7" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-semibold">{l.name}</div>
                   <div className="truncate font-mono text-xs text-muted">{sanLine(l.moves)}</div>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
 import { Layout } from './components/Layout';
+import { applyPieceSet } from './components/pieceSet';
 import { setSoundEnabled } from './core/sound';
 import { useProfile } from './data/store';
 import { startAutoSync } from './data/sync';
@@ -32,6 +33,10 @@ export function App() {
   useEffect(() => {
     if (profile) setSoundEnabled(profile.settings.sound);
   }, [profile]);
+  const pieceSet = profile?.settings.pieceSet;
+  useEffect(() => {
+    if (pieceSet) applyPieceSet(pieceSet);
+  }, [pieceSet]);
   useEffect(() => startAutoSync(), []);
 
   return (

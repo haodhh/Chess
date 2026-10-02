@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 @import '@lichess-org/chessground/assets/chessground.base.css';
 @import '@lichess-org/chessground/assets/chessground.brown.css';
-@import '@lichess-org/chessground/assets/chessground.cburnett.css';
+/* Piece images come from public/piece, chosen in Settings (components/pieceSet.ts). */
 
 /* Phones held sideways: little height, so the board goes beside the panel. */
 @custom-variant short (@media (orientation: landscape) and (max-height: 520px));
@@ -17,6 +17,12 @@
   --color-warn: #f5b84a;
   --color-muted: #a8a29e;
   --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* The app is always dark. Saying so stops browsers' automatic dark mode for websites
+   (Chrome, Cốc Cốc, Samsung Internet…) from recolouring it, which turned black pieces white. */
+:root {
+  color-scheme: dark;
 }
 
 html,

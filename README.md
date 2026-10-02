@@ -28,7 +28,7 @@
 - Danh sách phòng đang chờ (🔒 nếu có mật khẩu), vào phòng bằng mã.
 - Máy chủ kiểm tra nước đi và chạy đồng hồ; có cầu hòa, xin thua, chơi lại (đổi màu), vào lại ván khi rớt mạng, nhận thắng khi đối thủ rời quá 60 giây. Ván xong được lưu để phân tích.
 
-**Khác:** thống kê, mục tiêu hằng ngày, chuỗi ngày, 4 màu bàn cờ, sao lưu/khôi phục, cài lên màn hình chính điện thoại.
+**Khác:** thống kê, mục tiêu hằng ngày, chuỗi ngày, 4 màu bàn cờ, 6 bộ quân cờ (Cardinal, Merida, Maestro…), sao lưu/khôi phục, cài lên màn hình chính điện thoại.
 
 Kế hoạch tổng thể: [docs/PLAN.md](docs/PLAN.md).
 
@@ -67,4 +67,4 @@ Tên khai cuộc (`public/data/openings.json`) lấy từ [lichess-org/chess-ope
 
 ## Giấy phép
 
-GPL-3.0-or-later (vì dùng chessground và Stockfish, đều theo GPL-3.0). Dữ liệu puzzle và tên khai cuộc: CC0, nguồn Lichess.
+GPL-3.0-or-later (vì dùng chessground và Stockfish, đều theo GPL-3.0). Dữ liệu puzzle và tên khai cuộc: CC0, nguồn Lichess. Các bộ quân cờ trong `public/piece/` lấy từ Lichess, mỗi bộ có tác giả và giấy phép riêng (CC BY-NC-SA 4.0, GPLv2+, Apache 2.0), xem [public/piece/README.md](public/piece/README.md).

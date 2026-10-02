@@ -13,8 +13,9 @@ import {
   type LobbyEntry,
   type TimeControl,
 } from '../../pvp/api';
+import { PieceIcon } from '../../components/PieceIcon';
 
-const COLOR_LABEL = { white: '♔ Trắng', black: '♚ Đen', random: '🎲 Ngẫu nhiên' };
+const COLOR_LABEL = { white: 'Trắng', black: 'Đen', random: 'Ngẫu nhiên' };
 
 export function PvpLobby() {
   const navigate = useNavigate();
@@ -135,6 +136,7 @@ export function PvpLobby() {
             <div className="flex flex-wrap gap-2">
               {(['white', 'black', 'random'] as const).map((c) => (
                 <button key={c} className={`btn btn-sm py-2 ${color === c ? 'bg-accent text-white' : ''}`} onClick={() => setColor(c)}>
+                  {c === 'random' ? <span>🎲</span> : <PieceIcon color={c} />}
                   {COLOR_LABEL[c]}
                 </button>
               ))}
@@ -194,7 +196,7 @@ export function PvpLobby() {
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-semibold">{r.name}</div>
                     <div className="text-xs text-muted">
-                      {r.host} · {formatTime(r.time)} · chủ phòng cầm {COLOR_LABEL[r.hostColor].replace(/^\S+ /, '')}
+                      {r.host} · {formatTime(r.time)} · chủ phòng cầm {COLOR_LABEL[r.hostColor]}
                     </div>
                   </div>
                   <Link className="btn btn-sm py-2" to={`/pvp/${r.code}`}>

@@ -11,6 +11,7 @@ import { getEngine } from '../../engine/engine';
 import { useEngineGame } from '../../engine/useEngineGame';
 import { useProfile } from '../../data/store';
 import { clearOngoingBotGame, saveGame, saveOngoingBotGame, useOngoingBotGame } from '../../data/train';
+import { PieceIcon } from '../../components/PieceIcon';
 
 interface Setup {
   level: BotLevel;
@@ -82,7 +83,8 @@ export function Play() {
         <span className="text-sm text-muted">Bạn cầm:</span>
         {(['white', 'black', 'random'] as const).map((c) => (
           <button key={c} className={`btn btn-sm py-2 ${colorChoice === c ? 'bg-accent text-white' : ''}`} onClick={() => setColorChoice(c)}>
-            {c === 'white' ? '♔ Trắng' : c === 'black' ? '♚ Đen' : '🎲 Ngẫu nhiên'}
+            {c === 'random' ? <span>🎲</span> : <PieceIcon color={c} />}
+            {c === 'white' ? 'Trắng' : c === 'black' ? 'Đen' : 'Ngẫu nhiên'}
           </button>
         ))}
         <button

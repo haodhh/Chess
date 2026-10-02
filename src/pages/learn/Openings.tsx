@@ -7,6 +7,7 @@ import { playSound } from '../../core/sound';
 import { addRepertoireLine } from '../../data/learn';
 import { epdOf, loadOpenings, nodeAt, openingOf, type OpeningBook, type OpeningNode } from '../../data/openings';
 import { useProfile } from '../../data/store';
+import { PieceIcon } from '../../components/PieceIcon';
 
 const POPULAR = [
   "Italian Game",
@@ -155,10 +156,10 @@ export function Openings() {
             <div className="mb-2 text-sm">Thêm dòng này vào repertoire để luyện ghi nhớ:</div>
             <div className="grid grid-cols-2 gap-2">
               <button className="btn btn-sm py-2" onClick={() => save('white')}>
-                ♔ Tôi cầm Trắng
+                <PieceIcon color="white" /> Tôi cầm Trắng
               </button>
               <button className="btn btn-sm py-2" onClick={() => save('black')}>
-                ♚ Tôi cầm Đen
+                <PieceIcon color="black" /> Tôi cầm Đen
               </button>
             </div>
             {message && <div className="mt-2 text-sm text-good">{message}</div>}
