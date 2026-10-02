@@ -68,11 +68,12 @@ export function Home() {
 
       <section>
         <h2 className="mb-3 text-lg font-bold">Luyện tập & Học</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <Tile to="/train/play" icon="🤖" title="Chơi với máy" desc="7 mức độ, có gợi ý" />
           <Tile to="/train/games" icon="📚" title="Phân tích ván" desc="Tìm lỗi trong ván của bạn" />
           <Tile to="/train/drills" icon="🏁" title="Drills" desc="Chiếu hết & tàn cuộc kinh điển" />
           <Tile to="/learn" icon="🎓" title="Học" desc="Bài học tương tác theo lộ trình" />
+          <Tile to="/pvp" icon="⚔️" title="Chơi online" desc="Tạo phòng, đặt mật khẩu, mời bạn bè" />
         </div>
       </section>
     </div>

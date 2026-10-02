@@ -13,6 +13,8 @@ import { SettingsPage } from './pages/Settings';
 import { Stats } from './pages/Stats';
 import { ThemePuzzles, Themes } from './pages/Themes';
 import { LearnHub } from './pages/learn/LearnHub';
+import { PvpLobby } from './pages/pvp/PvpLobby';
+import { PvpRoom } from './pages/pvp/PvpRoom';
 import { LessonPage } from './pages/learn/LessonPage';
 import { Openings } from './pages/learn/Openings';
 import { RepertoirePage } from './pages/learn/RepertoirePage';
@@ -44,6 +46,8 @@ export function App() {
           <Route path="daily" element={<Daily />} />
           <Route path="stats" element={<Stats />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="pvp" element={<PvpLobby />} />
+          <Route path="pvp/:code" element={<PvpRoom />} />
           <Route path="train" element={<TrainHub />} />
           <Route path="train/play" element={<Play />} />
           <Route path="train/games" element={<Games />} />

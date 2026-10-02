@@ -444,6 +444,7 @@ các theme yếu ở module Puzzle.
 - [ ] Chạy offline (service worker); thêm tiếng Anh.
 
 ### Phase 5 — Sau MVP (tùy chọn)
+- [x] Chơi online theo phòng: Cloudflare Worker + Durable Objects, mật khẩu phòng, danh sách phòng, đồng hồ, cầu hòa/xin thua/chơi lại, vào lại ván.
 - Tài khoản và đồng bộ cloud (vd. Supabase).
 - Chơi online realtime: WebSocket, ghép cặp, Elo.
 - Puzzle Battle.

@@ -1,0 +1,22 @@
+// Cloudflare Worker: the built app (dist/) plus the online play server.
+// Cloudflare runs `npm run build` and then `npx wrangler deploy` on every push.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chess",
+  "main": "worker/index.ts",
+  "compatibility_date": "2025-09-15",
+  // Builds dist/ before deploying, whatever build command the Cloudflare project has.
+  "build": { "command": "npm run build" },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "ROOMS", "class_name": "ChessRoom" },
+      { "name": "LOBBY", "class_name": "Lobby" }
+    ]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ChessRoom", "Lobby"] }],
+  "observability": { "enabled": true }
+}

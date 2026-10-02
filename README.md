@@ -1,6 +1,6 @@
 # Cờ Vua Luyện Tập
 
-Ứng dụng web luyện cờ vua, lấy cảm hứng từ Chess.com, chạy hoàn toàn trên trình duyệt và được host trên GitHub Pages.
+Ứng dụng web luyện cờ vua, lấy cảm hứng từ Chess.com. Phần luyện tập chạy hoàn toàn trên trình duyệt; chế độ chơi online dùng một Cloudflare Worker.
 
 **Chơi ngay:** https://haodhh.github.io/Chess/
 
@@ -21,6 +21,11 @@
 **Học**
 - **17 bài học tương tác** (Nền tảng, Chiến thuật, Tàn cuộc): giải thích, tự đi quân, trắc nghiệm, puzzle theo chủ đề.
 - **Cây khai cuộc** với 3.815 biến có tên, và **Repertoire**: luyện thuộc các biến bạn chọn.
+
+**Chơi online (PvP)**
+- Tạo phòng (tên, mật khẩu tùy chọn, màu quân, thời gian 3+2 … 30+0 hoặc không giới hạn), gửi mã phòng/link cho bạn bè.
+- Danh sách phòng đang chờ (🔒 nếu có mật khẩu), vào phòng bằng mã.
+- Máy chủ kiểm tra nước đi và chạy đồng hồ; có cầu hòa, xin thua, chơi lại (đổi màu), vào lại ván khi rớt mạng, nhận thắng khi đối thủ rời quá 60 giây. Ván xong được lưu để phân tích.
 
 **Khác:** thống kê, mục tiêu hằng ngày, chuỗi ngày, 4 màu bàn cờ, sao lưu/khôi phục, cài lên màn hình chính điện thoại.
 
@@ -55,7 +60,9 @@ Tên khai cuộc (`public/data/openings.json`) lấy từ [lichess-org/chess-ope
 
 ## Deploy
 
-Workflow **Build and deploy** chạy test, build và deploy lên GitHub Pages mỗi khi push lên nhánh mặc định. Cần bật một lần: **Settings → Pages → Source: GitHub Actions**.
+**Cloudflare (đầy đủ, gồm chơi online):** `wrangler.jsonc` mô tả một Worker phục vụ thư mục `dist/` và máy chủ phòng chơi (Durable Objects `ChessRoom`, `Lobby`, trong `worker/`). Với Cloudflare Workers nối GitHub, mỗi lần push Cloudflare chạy `npx wrangler deploy` (lệnh này tự chạy `npm run build` trước). Tên Worker trong `wrangler.jsonc` (`chess`) phải trùng tên Worker trên Cloudflare. Chạy thử trên máy: `npm run dev:worker` (http://localhost:8787).
+
+**GitHub Pages (không có chơi online):** workflow **Build and deploy** chạy test, build và deploy mỗi khi push lên nhánh mặc định. Cần bật một lần: **Settings → Pages → Source: GitHub Actions**. Muốn bản GitHub Pages dùng máy chủ Cloudflare, đặt biến `VITE_PVP_SERVER` (ví dụ `https://chess.<tài-khoản>.workers.dev`) khi build.
 
 ## Giấy phép
 

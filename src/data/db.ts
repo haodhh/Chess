@@ -61,7 +61,7 @@ export interface RushRun {
   puzzles: { id: string; rating: number; success: boolean }[];
 }
 
-export type GameSource = 'bot' | 'pgn';
+export type GameSource = 'bot' | 'pgn' | 'pvp';
 
 export interface GameAnalysis {
   depth: number;

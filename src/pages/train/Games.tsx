@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { gameFromPgn } from '../../data/importGames';
 import { deleteGame, saveGame, useGames } from '../../data/train';
 
-const SOURCE_LABEL: Record<string, string> = { bot: '🤖 Với máy', pgn: '📄 PGN' };
+const SOURCE_LABEL: Record<string, string> = { bot: '🤖 Với máy', pgn: '📄 PGN', pvp: '⚔️ Online' };
 
 export function Games() {
   const games = useGames();

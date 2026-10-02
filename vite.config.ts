@@ -9,6 +9,6 @@ export default defineConfig({
   build: { chunkSizeWarningLimit: 700 },
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts', 'scripts/**/*.test.mjs'],
+    include: ['src/**/*.test.ts', 'scripts/**/*.test.mjs', 'worker/**/*.test.ts'],
   },
 });

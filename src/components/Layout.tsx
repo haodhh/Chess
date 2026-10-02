@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router';
 import { useDueCount } from '../data/store';
+import { ErrorBoundary } from './ErrorBoundary';
 import { SyncStatus } from './SyncStatus';
 import { useNow } from './useNow';
 
@@ -20,6 +21,7 @@ const NAV: NavItem[] = [
   { to: '/stats', icon: '📈', label: 'Thống kê' },
   { to: '/train', icon: '🏋️', label: 'Luyện tập' },
   { to: '/learn', icon: '🎓', label: 'Học' },
+  { to: '/pvp', icon: '⚔️', label: 'Chơi online' },
   { to: '/settings', icon: '⚙️', label: 'Cài đặt' },
 ];
 
@@ -58,7 +60,9 @@ export function Layout() {
         <nav className="flex gap-1 overflow-x-auto px-2 pb-2">{items}</nav>
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 p-4 lg:p-6">
-        <Outlet />
+        <ErrorBoundary key={location.hash}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
     </div>
   );
