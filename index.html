@@ -6,9 +6,27 @@
     <meta name="theme-color" content="#262421" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Cờ Vua Luyện Tập</title>
+    <style>
+      body {
+        margin: 0;
+        background: #262421;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Replaced by the app once it loads. -->
+      <p style="font-family: system-ui, sans-serif; color: #a8a29e; text-align: center; margin-top: 40vh">Đang tải…</p>
+      <p id="load-hint" hidden style="font-family: system-ui, sans-serif; color: #a8a29e; text-align: center">
+        Trang không tải được. Nếu đây là GitHub Pages, hãy chọn Settings → Pages → Source: GitHub Actions.
+      </p>
+    </div>
+    <script>
+      setTimeout(function () {
+        var hint = document.getElementById('load-hint');
+        if (hint) hint.hidden = false;
+      }, 5000);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
