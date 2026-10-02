@@ -3,7 +3,6 @@ import { HashRouter, Route, Routes } from 'react-router';
 import { Layout } from './components/Layout';
 import { setSoundEnabled } from './core/sound';
 import { useProfile } from './data/store';
-import { ComingSoon } from './pages/ComingSoon';
 import { Daily } from './pages/Daily';
 import { Home } from './pages/Home';
 import { RatedPuzzles } from './pages/RatedPuzzles';
@@ -12,6 +11,10 @@ import { Rush } from './pages/Rush';
 import { SettingsPage } from './pages/Settings';
 import { Stats } from './pages/Stats';
 import { ThemePuzzles, Themes } from './pages/Themes';
+import { LearnHub } from './pages/learn/LearnHub';
+import { LessonPage } from './pages/learn/LessonPage';
+import { Openings } from './pages/learn/Openings';
+import { RepertoirePage } from './pages/learn/RepertoirePage';
 import { Analysis } from './pages/train/Analysis';
 import { DrillPage, Drills } from './pages/train/Drills';
 import { GameReview } from './pages/train/GameReview';
@@ -47,7 +50,10 @@ export function App() {
           <Route path="train/drills/:id" element={<DrillPage />} />
           <Route path="train/vision" element={<Vision />} />
           <Route path="train/analysis" element={<Analysis />} />
-          <Route path="learn" element={<ComingSoon section="learn" />} />
+          <Route path="learn" element={<LearnHub />} />
+          <Route path="learn/lesson/:id" element={<LessonPage />} />
+          <Route path="learn/openings" element={<Openings />} />
+          <Route path="learn/repertoire" element={<RepertoirePage />} />
           <Route path="*" element={<Home />} />
         </Route>
       </Routes>

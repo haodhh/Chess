@@ -4,17 +4,27 @@
 
 **Chơi ngay:** https://haodhh.github.io/Chess/
 
-## Đã có: Puzzle
+## Tính năng
 
-- **Puzzle tính điểm:** puzzle được chọn quanh rating của bạn (Glicko-2), có 3 mức độ khó (Dễ / Vừa / Khó), gợi ý, xem lời giải và xem lại từng nước.
-- **Theo chủ đề:** hơn 60 chủ đề (chĩa đôi, ghim, xiên, các mẫu chiếu hết, tàn cuộc…), kèm tỉ lệ đúng của bạn ở từng chủ đề.
-- **Puzzle Rush:** 3 phút, 5 phút hoặc Sống sót; sai 3 lần là hết; lưu kỷ lục.
-- **Ôn lỗi:** mọi puzzle giải sai được hẹn lịch ôn lại bằng thuật toán lặp lại ngắt quãng FSRS.
-- **Puzzle hằng ngày**, **thống kê** (biểu đồ rating, chủ đề yếu nhất, lịch sử) và **cài đặt** (màu bàn cờ, âm thanh, sao lưu/khôi phục dữ liệu).
+**Puzzle**
+- **Puzzle tính điểm:** chọn quanh rating của bạn (Glicko-2), 3 mức độ khó, gợi ý, xem lời giải, xem lại từng nước.
+- **Theo chủ đề:** hơn 60 chủ đề (chĩa đôi, ghim, các mẫu chiếu hết, tàn cuộc…) kèm tỉ lệ đúng của bạn.
+- **Puzzle Rush** (3 phút / 5 phút / Sống sót), **Puzzle hằng ngày**.
+- **Ôn lỗi:** puzzle giải sai và lỗi trong ván của bạn được hẹn lịch ôn bằng FSRS.
 
-Tiến độ được lưu trong trình duyệt (IndexedDB). Dùng **Cài đặt → Sao lưu** để chuyển dữ liệu sang máy khác.
+**Luyện tập** (Stockfish 19 chạy ngay trong trình duyệt)
+- **Chơi với máy:** 7 mức từ ~400 tới Stockfish tối đa, có gợi ý và đi lại.
+- **Phân tích ván:** nhập ván từ chess.com, Lichess hoặc PGN; phân loại từng nước (tốt nhất → sai nghiêm trọng), độ chính xác, biểu đồ đánh giá, thử lại nước sai và đưa vào Ôn lỗi.
+- **Drills:** 10 thế chiếu hết và tàn cuộc kinh điển (Lucena, Philidor, đối vương…) chơi với Stockfish.
+- **Luyện tọa độ** và **bàn phân tích** tự do.
 
-Phần **Luyện tập (Train)** và **Học (Learn)** sẽ làm tiếp theo [kế hoạch](docs/PLAN.md).
+**Học**
+- **17 bài học tương tác** (Nền tảng, Chiến thuật, Tàn cuộc): giải thích, tự đi quân, trắc nghiệm, puzzle theo chủ đề.
+- **Cây khai cuộc** với 3.815 biến có tên, và **Repertoire**: luyện thuộc các biến bạn chọn.
+
+**Khác:** thống kê, mục tiêu hằng ngày, chuỗi ngày, 4 màu bàn cờ, sao lưu/khôi phục, cài lên màn hình chính điện thoại.
+
+Tiến độ được lưu trong trình duyệt (IndexedDB). Dùng **Cài đặt → Sao lưu** để chuyển dữ liệu sang máy khác. Kế hoạch tổng thể: [docs/PLAN.md](docs/PLAN.md).
 
 ## Phát triển
 
@@ -25,7 +35,7 @@ npm test         # unit test (Vitest)
 npm run build    # bản build tĩnh trong dist/
 ```
 
-Công nghệ: React + TypeScript + Vite, Tailwind CSS, [chessground](https://github.com/lichess-org/chessground) (bàn cờ của Lichess), chess.js, Dexie (IndexedDB), ts-fsrs.
+Công nghệ: React + TypeScript + Vite, Tailwind CSS, [chessground](https://github.com/lichess-org/chessground) (bàn cờ của Lichess), chess.js, [Stockfish.js](https://github.com/nmrugg/stockfish.js) (bản lite, `public/engine/`), Dexie (IndexedDB), ts-fsrs.
 
 ## Dữ liệu puzzle
 
@@ -35,10 +45,12 @@ Công nghệ: React + TypeScript + Vite, Tailwind CSS, [chessground](https://git
 curl -L https://database.lichess.org/lichess_db_puzzle.csv.zst | zstd -dc | npm run build:puzzles
 ```
 
+Tên khai cuộc (`public/data/openings.json`) lấy từ [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings); tạo lại bằng `npm run build:openings`.
+
 ## Deploy
 
 Workflow **Build and deploy** chạy test, build và deploy lên GitHub Pages mỗi khi push lên nhánh mặc định. Cần bật một lần: **Settings → Pages → Source: GitHub Actions**.
 
 ## Giấy phép
 
-GPL-3.0-or-later (vì dùng chessground, cũng theo GPL-3.0). Dữ liệu puzzle: CC0, nguồn Lichess.
+GPL-3.0-or-later (vì dùng chessground và Stockfish, đều theo GPL-3.0). Dữ liệu puzzle và tên khai cuộc: CC0, nguồn Lichess.

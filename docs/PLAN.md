@@ -402,8 +402,8 @@ các theme yếu ở module Puzzle.
 ### Phase 0 — Nền móng (~1 tuần)
 - [x] Khởi tạo Vite + React + TS + Tailwind, Vitest; CI và deploy GitHub Pages trên GitHub Actions. (Chưa có ESLint/Prettier.)
 - [x] Component `ChessBoard` (chessground): kéo-thả và click-click, hộp chọn phong cấp, highlight nước vừa đi, mũi tên, âm thanh, 4 màu bàn cờ.
-- [ ] `Game` model bọc chess.js; `MoveList`; `EvalBar`. (Đã có MoveList trong màn puzzle; EvalBar làm cùng engine ở Phase 2.)
-- [ ] Engine service: Stockfish WASM chạy trong worker, API `analyse(fen, {depth, multiPv})` và `bestMove(fen, opts)`. (Dời sang Phase 2, vì Puzzle không cần engine.)
+- [x] `MoveTable`, `EvalBar`, `EvalGraph` dùng chung (logic ván cờ dùng trực tiếp chess.js).
+- [x] Engine service: Stockfish 19 lite (WASM, single-thread) chạy trong Web Worker, hàng đợi phân tích, MultiPV, giới hạn Elo.
 - [x] Dexie DB; layout và điều hướng (Home, Puzzles, Train, Learn, Settings); giao diện tiếng Việt.
 - **Xong khi:** hai người chơi được một ván đúng luật trên cùng một máy, engine trả về nước tốt nhất, bản build đã lên mạng.
 
@@ -419,27 +419,28 @@ các theme yếu ở module Puzzle.
   puzzle sai xuất hiện lại đúng lịch ôn.
 
 ### Phase 2 — Train (~3 tuần)
-- [ ] Vision trainer (3 kiểu luyện, chọn Trắng/Đen).
-- [ ] Chơi với bot (7 mức, gợi ý, đi lại, đồng hồ).
-- [ ] Analysis board (thanh eval, các biến từ MultiPV).
-- [ ] Game Review: phân tích nền, phân loại nước, accuracy, biểu đồ, key moments.
-- [ ] Nhập ván: PGN, chess.com, Lichess.
-- [ ] “Thử lại” lỗi; tự tạo puzzle cá nhân và đưa vào SRS.
-- [ ] Drills: bộ chiếu hết và tàn cuộc cơ bản, chấm sao.
+- [x] Vision trainer (Tìm ô / Gọi tên ô, chọn Trắng/Đen/ngẫu nhiên, kỷ lục).
+- [x] Chơi với bot (7 mức, gợi ý, đi lại, xin thua; ván tự lưu để phân tích). Chưa có đồng hồ.
+- [x] Analysis board (thanh eval, 3 biến MultiPV, tải FEN/PGN).
+- [x] Game Review: phân tích nền, phân loại nước (kể cả nước khai cuộc), accuracy, biểu đồ, thời điểm quan trọng.
+- [x] Nhập ván: PGN, chess.com, Lichess (20 ván gần nhất).
+- [x] “Thử lại” lỗi; tự tạo puzzle cá nhân và đưa vào SRS.
+- [x] Drills: 10 thế chiếu hết và tàn cuộc cơ bản (đã kiểm tra bằng Stockfish), chấm sao.
 - **Xong khi:** nhập được 1 tháng ván từ tài khoản chess.com của bạn, review xong một ván 40 nước trong
   thời gian hợp lý trên laptop, các lỗi xuất hiện trong hàng đợi ôn tập.
 
 ### Phase 3 — Learn (~3–4 tuần, nội dung viết liên tục)
-- [ ] Lesson engine với 5 loại bước, lưu tiến độ và chấm sao.
-- [ ] Khoảng 30 bài đầu tiên (Nền tảng, Chiến thuật, Tàn cuộc).
-- [ ] Opening explorer với tên khai cuộc.
-- [ ] Repertoire trainer (SRS theo từng nút).
+- [x] Lesson engine với 6 loại bước (giải thích, đi quân, chọn ô, trắc nghiệm, puzzle theo chủ đề, liên kết drill), lưu tiến độ và chấm sao.
+- [x] 17 bài đầu tiên (Nền tảng 6, Chiến thuật 7, Tàn cuộc 4; xem `src/content/lessons.ts`); mọi đáp án đã kiểm tra bằng Stockfish. Sẽ bổ sung dần tới ~30 bài (trung cuộc, khai cuộc).
+- [x] Opening explorer với tên khai cuộc (3.815 biến, CC0 của Lichess).
+- [x] Repertoire trainer (SRS theo từng dòng).
 - **Xong khi:** học hết một lộ trình từ đầu đến cuối, mỗi bài kết thúc bằng một bộ puzzle đúng chủ đề.
 
 ### Phase 4 — Hoàn thiện (~1–2 tuần)
 - [x] Dashboard: mục tiêu ngày, streak, gợi ý luyện theo điểm yếu.
 - [x] Daily puzzle; backup và khôi phục dữ liệu; giao diện mobile cơ bản.
-- [ ] PWA offline; thêm tiếng Anh.
+- [x] Web app manifest: cài lên màn hình chính điện thoại.
+- [ ] Chạy offline (service worker); thêm tiếng Anh.
 
 ### Phase 5 — Sau MVP (tùy chọn)
 - Tài khoản và đồng bộ cloud (vd. Supabase).
@@ -485,4 +486,4 @@ Mỗi tuần xem lại rating puzzle và các theme yếu để chọn trọng t
 3. **License GPL-3.0** cho dự án: đồng ý không?
 4. Có cần **nhập ván từ tài khoản chess.com** của bạn ngay ở Phase 2 không? (Đề xuất: có, vì đây là nguồn lỗi thật để luyện.)
 
-**Trạng thái (10/2026):** đã xong Phase 0 (trừ engine) và Phase 1 – Puzzle, chạy trên GitHub Pages.
+**Trạng thái (10/2026):** đã xong Phase 0–3 (Puzzle, Train, Learn) và phần lớn Phase 4, chạy trên GitHub Pages.

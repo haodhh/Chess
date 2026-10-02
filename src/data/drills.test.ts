@@ -5,7 +5,11 @@ import { DRILLS, starsFor } from './drills';
 describe('drills', () => {
   it('have legal positions and unique ids', () => {
     expect(new Set(DRILLS.map((d) => d.id)).size).toBe(DRILLS.length);
-    for (const d of DRILLS) expect(() => new Chess(d.fen)).not.toThrow();
+    for (const d of DRILLS) {
+      expect(() => new Chess(d.fen)).not.toThrow();
+      const flipped = d.fen.replace(/ ([wb]) /, (_, t) => (t === 'w' ? ' b ' : ' w '));
+      expect(new Chess(flipped).inCheck(), d.id).toBe(false);
+    }
   });
 
   it('award stars by move count', () => {

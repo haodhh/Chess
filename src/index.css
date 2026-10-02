@@ -125,3 +125,11 @@ body {
 .board-frame cg-board square.vision-bad {
   background: rgba(226, 87, 76, 0.85);
 }
+
+/* Lesson board marks. */
+.board-frame cg-board square.lesson-mark {
+  background: rgba(255, 196, 0, 0.45);
+}
+.board-frame cg-board square.lesson-dest {
+  background: radial-gradient(rgba(20, 85, 30, 0.55) 22%, transparent 23%);
+}

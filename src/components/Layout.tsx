@@ -18,7 +18,7 @@ const NAV: NavItem[] = [
   { to: '/daily', icon: '📅', label: 'Hằng ngày' },
   { to: '/stats', icon: '📈', label: 'Thống kê' },
   { to: '/train', icon: '🏋️', label: 'Luyện tập' },
-  { to: '/learn', icon: '🎓', label: 'Học', soon: true },
+  { to: '/learn', icon: '🎓', label: 'Học' },
   { to: '/settings', icon: '⚙️', label: 'Cài đặt' },
 ];
 
