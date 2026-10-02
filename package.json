@@ -6,10 +6,10 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -p . && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc -b",
+    "typecheck": "tsc -p .",
     "build:puzzles": "node scripts/build-puzzles.mjs"
   },
   "dependencies": {

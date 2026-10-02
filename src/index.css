@@ -1,0 +1,116 @@
+@import 'tailwindcss';
+@import '@lichess-org/chessground/assets/chessground.base.css';
+@import '@lichess-org/chessground/assets/chessground.brown.css';
+@import '@lichess-org/chessground/assets/chessground.cburnett.css';
+
+@theme {
+  --color-bg: #262421;
+  --color-panel: #312e2b;
+  --color-panel-2: #3d3a37;
+  --color-accent: #81b64c;
+  --color-accent-dark: #5d8a32;
+  --color-good: #81b64c;
+  --color-bad: #e2574c;
+  --color-warn: #f5b84a;
+  --color-muted: #a8a29e;
+  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: #f5f5f4;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-panel-2 px-4 py-2.5 font-semibold transition-colors hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply bg-accent text-white shadow-[0_4px_0_0_var(--color-accent-dark)] hover:bg-[#95c95e] active:translate-y-0.5 active:shadow-none;
+  }
+  .btn-sm {
+    @apply px-2 py-1 text-xs;
+  }
+  .card {
+    @apply rounded-xl bg-panel p-4;
+  }
+  .link {
+    @apply text-accent hover:underline;
+  }
+}
+
+/* Board themes: a checkerboard drawn with a conic gradient, a1 is always dark. */
+.board-green {
+  --sq-light: #ebecd0;
+  --sq-dark: #739552;
+}
+.board-brown {
+  --sq-light: #f0d9b5;
+  --sq-dark: #b58863;
+}
+.board-blue {
+  --sq-light: #dee3e6;
+  --sq-dark: #8ca2ad;
+}
+.board-purple {
+  --sq-light: #efe9f7;
+  --sq-dark: #8877b7;
+}
+.board-frame cg-board {
+  background: repeating-conic-gradient(var(--sq-dark) 0 25%, var(--sq-light) 0 50%) 0 0 / 25% 25%;
+  border-radius: 4px;
+}
+/* Coordinates inside the edge squares: ranks top-left, files bottom-right, in the opposite square colour. */
+.board-frame .cg-wrap coords {
+  font-size: clamp(9px, 1.6vmin, 13px);
+  font-weight: 700;
+  opacity: 1;
+}
+.board-frame .cg-wrap coords.ranks {
+  top: 0;
+  left: 3px;
+  padding-top: 2px;
+}
+.board-frame .cg-wrap coords.ranks coord {
+  transform: none;
+}
+.board-frame .cg-wrap coords.files {
+  bottom: 1px;
+  left: 0;
+  height: auto;
+  text-align: right;
+}
+.board-frame .cg-wrap coords.files coord {
+  padding-right: 4px;
+  text-transform: lowercase;
+}
+/* Children are in a..h / 1..8 order for both orientations; a1 is dark. */
+.board-frame .orientation-white .ranks :nth-child(odd),
+.board-frame .orientation-white .files :nth-child(odd),
+.board-frame .orientation-black .ranks :nth-child(even),
+.board-frame .orientation-black .files :nth-child(even) {
+  color: var(--sq-light);
+}
+.board-frame .orientation-white .ranks :nth-child(even),
+.board-frame .orientation-white .files :nth-child(even),
+.board-frame .orientation-black .ranks :nth-child(odd),
+.board-frame .orientation-black .files :nth-child(odd) {
+  color: var(--sq-dark);
+}
+.board-frame cg-board square.last-move {
+  background-color: rgba(255, 255, 51, 0.42);
+}
+
+/* Pieces shown in the promotion chooser. */
+.promotion-overlay .cg-wrap {
+  width: 85%;
+  height: 85%;
+}
+.promotion-overlay piece {
+  position: static;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
