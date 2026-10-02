@@ -2,6 +2,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Rating } from 'ts-fsrs';
 import { scheduleReview } from '../core/srs';
 import { db, type LessonProgress, type Repertoire } from './db';
+import type { Row } from './merge';
+import { markDeleted } from './store';
 
 export async function completeLesson(lessonId: string, stars: number) {
   const prev = await db.lessons.get(lessonId);
@@ -33,5 +35,7 @@ export async function gradeRepertoireLine(line: Repertoire, mistakes: number) {
 }
 
 export async function deleteRepertoireLine(id: number) {
+  const line = await db.repertoire.get(id);
+  if (line) await markDeleted('repertoire', line as unknown as Row);
   await db.repertoire.delete(id);
 }

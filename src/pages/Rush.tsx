@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
+import { Chess } from 'chess.js';
+import { parseUci } from '../core/chess';
 import { PuzzlePlayer, type PuzzleOutcome } from '../components/PuzzlePlayer';
 import type { Puzzle } from '../core/puzzle';
 import { playSound } from '../core/sound';
@@ -12,6 +15,13 @@ const MODES: Record<RushMode, { label: string; icon: string; seconds: number | n
   survival: { label: 'Sống sót', icon: '❤️', seconds: null, desc: 'Không giới hạn thời gian, chỉ có 3 mạng.' },
 };
 const MAX_STRIKES = 3;
+
+/** The position the solver faced: after the opponent's setup move. */
+function puzzleStartFen(p: Puzzle): string {
+  const c = new Chess(p.fen);
+  c.move(parseUci(p.moves[0]));
+  return c.fen();
+}
 const targetFor = (i: number) => Math.min(2700, 600 + i * 55);
 
 interface LogEntry {
@@ -178,15 +188,14 @@ function RushRun({
           <p className="mb-3 text-xs text-muted">Bài sai đã được thêm vào mục Ôn lỗi.</p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {log.map((e, i) => (
-              <a
+              <Link
                 key={e.puzzle.id}
-                href={`https://lichess.org/training/${e.puzzle.id}`}
-                target="_blank"
-                rel="noreferrer"
+                to={`/train/analysis?fen=${encodeURIComponent(puzzleStartFen(e.puzzle))}`}
+                title="Mở thế cờ trên bàn phân tích"
                 className={`rounded-lg px-3 py-2 text-sm ${e.success ? 'bg-good/20' : 'bg-bad/20'}`}
               >
                 <span className="font-bold">{i + 1}.</span> {e.success ? '✓' : '✗'} {e.puzzle.rating}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

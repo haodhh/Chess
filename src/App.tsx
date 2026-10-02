@@ -3,6 +3,7 @@ import { HashRouter, Route, Routes } from 'react-router';
 import { Layout } from './components/Layout';
 import { setSoundEnabled } from './core/sound';
 import { useProfile } from './data/store';
+import { startAutoSync } from './data/sync';
 import { Daily } from './pages/Daily';
 import { Home } from './pages/Home';
 import { RatedPuzzles } from './pages/RatedPuzzles';
@@ -28,6 +29,7 @@ export function App() {
   useEffect(() => {
     if (profile) setSoundEnabled(profile.settings.sound);
   }, [profile]);
+  useEffect(() => startAutoSync(), []);
 
   return (
     <HashRouter>

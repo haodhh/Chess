@@ -26,6 +26,8 @@ export interface Profile {
   createdAt: number;
   onboarded: boolean;
   settings: Settings;
+  /** Last change of any profile field, used when merging with the online copy. */
+  updatedAt?: number;
 }
 
 export interface Attempt {
@@ -59,7 +61,7 @@ export interface RushRun {
   puzzles: { id: string; rating: number; success: boolean }[];
 }
 
-export type GameSource = 'bot' | 'pgn' | 'chesscom' | 'lichess';
+export type GameSource = 'bot' | 'pgn';
 
 export interface GameAnalysis {
   depth: number;
@@ -79,8 +81,6 @@ export interface SavedGame {
   result: string;
   /** The side the user played, used for review and personal puzzles. */
   userColor: 'white' | 'black';
-  /** Game id on chess.com/Lichess, to avoid importing twice. */
-  externalId?: string;
   analysis?: GameAnalysis;
 }
 
@@ -116,6 +116,13 @@ export interface LessonProgress {
   completedAt: number;
 }
 
+/** Small named values, e.g. the game in progress. */
+export interface KeyValue {
+  key: string;
+  value: unknown;
+  updatedAt: number;
+}
+
 export const db = new Dexie('chess-trainer') as Dexie & {
   profile: EntityTable<Profile, 'id'>;
   attempts: EntityTable<Attempt, 'id'>;
@@ -126,6 +133,7 @@ export const db = new Dexie('chess-trainer') as Dexie & {
   visionRuns: EntityTable<VisionRun, 'id'>;
   repertoire: EntityTable<Repertoire, 'id'>;
   lessons: EntityTable<LessonProgress, 'lessonId'>;
+  kv: EntityTable<KeyValue, 'key'>;
 };
 
 db.version(1).stores({
@@ -141,3 +149,4 @@ db.version(2).stores({
   repertoire: '++id, due',
   lessons: 'lessonId',
 });
+db.version(3).stores({ kv: 'key' });

@@ -2,6 +2,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import type { Puzzle } from '../core/puzzle';
 import { scheduleReview } from '../core/srs';
 import { Rating } from 'ts-fsrs';
+import type { Row } from './merge';
+import { markDeleted } from './store';
 import { db, type DrillResult, type GameAnalysis, type SavedGame, type VisionRun } from './db';
 
 export async function saveGame(game: Omit<SavedGame, 'id'>): Promise<number> {
@@ -21,12 +23,9 @@ export async function saveAnalysis(id: number, analysis: GameAnalysis) {
 }
 
 export async function deleteGame(id: number) {
+  const game = await db.games.get(id);
+  if (game) await markDeleted('games', game as unknown as Row);
   await db.games.delete(id);
-}
-
-export async function knownExternalIds(): Promise<Set<string>> {
-  const keys = await db.games.orderBy('externalId').uniqueKeys();
-  return new Set(keys as string[]);
 }
 
 /** Adds a position from the user's own game to the review queue, due now. */
@@ -62,4 +61,25 @@ export function useVisionBest(): Record<string, number> | undefined {
     });
     return best;
   });
+}
+
+export interface OngoingBotGame {
+  levelId: string;
+  userColor: 'white' | 'black';
+  moves: string[];
+}
+
+const ONGOING = 'ongoingBotGame';
+
+export function useOngoingBotGame(): OngoingBotGame | null | undefined {
+  return useLiveQuery(async () => ((await db.kv.get(ONGOING))?.value as OngoingBotGame | undefined) ?? null);
+}
+
+export async function saveOngoingBotGame(game: OngoingBotGame) {
+  await db.kv.put({ key: ONGOING, value: game, updatedAt: Date.now() });
+}
+
+export async function clearOngoingBotGame() {
+  // Kept as an empty value rather than deleted, so the clear also reaches other devices.
+  await db.kv.put({ key: ONGOING, value: null, updatedAt: Date.now() });
 }

@@ -423,7 +423,7 @@ các theme yếu ở module Puzzle.
 - [x] Chơi với bot (7 mức, gợi ý, đi lại, xin thua; ván tự lưu để phân tích). Chưa có đồng hồ.
 - [x] Analysis board (thanh eval, 3 biến MultiPV, tải FEN/PGN).
 - [x] Game Review: phân tích nền, phân loại nước (kể cả nước khai cuộc), accuracy, biểu đồ, thời điểm quan trọng.
-- [x] Nhập ván: PGN, chess.com, Lichess (20 ván gần nhất).
+- [x] Thêm ván bằng PGN. (Đã bỏ nhập từ chess.com/Lichess theo yêu cầu: app chỉ để tự luyện, không đồng bộ với hệ thống khác.)
 - [x] “Thử lại” lỗi; tự tạo puzzle cá nhân và đưa vào SRS.
 - [x] Drills: 10 thế chiếu hết và tàn cuộc cơ bản (đã kiểm tra bằng Stockfish), chấm sao.
 - **Xong khi:** nhập được 1 tháng ván từ tài khoản chess.com của bạn, review xong một ván 40 nước trong
@@ -440,6 +440,7 @@ các theme yếu ở module Puzzle.
 - [x] Dashboard: mục tiêu ngày, streak, gợi ý luyện theo điểm yếu.
 - [x] Daily puzzle; backup và khôi phục dữ liệu; giao diện mobile cơ bản.
 - [x] Web app manifest: cài lên màn hình chính điện thoại.
+- [x] Lưu dữ liệu: tự động trong trình duyệt (yêu cầu lưu bền vững), lưu online tùy chọn vào Gist bí mật của GitHub với gộp dữ liệu nhiều thiết bị; lưu ván đang chơi dở.
 - [ ] Chạy offline (service worker); thêm tiếng Anh.
 
 ### Phase 5 — Sau MVP (tùy chọn)

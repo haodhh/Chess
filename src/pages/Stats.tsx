@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router';
-import { useNow } from '../components/Layout';
+import { useNow } from '../components/useNow';
 import { RatingChart } from '../components/RatingChart';
 import { isProvisional } from '../core/glicko2';
 import { ratingHistory, streakDays, themeStats, weakestThemes } from '../core/stats';

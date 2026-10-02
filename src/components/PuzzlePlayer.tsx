@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Link } from 'react-router';
 import { Chess, type Move } from 'chess.js';
 import type { DrawShape } from '@lichess-org/chessground/draw';
 import type { Key } from '@lichess-org/chessground/types';
@@ -317,17 +318,9 @@ function PuzzleMeta({ puzzle, fen }: { puzzle: Puzzle; fen: string }) {
         ))}
       </div>
       <div className="flex flex-wrap gap-3 text-xs">
-        <a className="link" href={`https://lichess.org/training/${puzzle.id}`} target="_blank" rel="noreferrer">
-          Xem trên Lichess ↗
-        </a>
-        <a
-          className="link"
-          href={`https://lichess.org/analysis/standard/${fen.replace(/ /g, '_')}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Phân tích thế cờ ↗
-        </a>
+        <Link className="link" to={`/train/analysis?fen=${encodeURIComponent(fen)}`}>
+          🔍 Phân tích thế cờ này
+        </Link>
       </div>
     </div>
   );

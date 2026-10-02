@@ -13,8 +13,8 @@
 - **Ôn lỗi:** puzzle giải sai và lỗi trong ván của bạn được hẹn lịch ôn bằng FSRS.
 
 **Luyện tập** (Stockfish 19 chạy ngay trong trình duyệt)
-- **Chơi với máy:** 7 mức từ ~400 tới Stockfish tối đa, có gợi ý và đi lại.
-- **Phân tích ván:** nhập ván từ chess.com, Lichess hoặc PGN; phân loại từng nước (tốt nhất → sai nghiêm trọng), độ chính xác, biểu đồ đánh giá, thử lại nước sai và đưa vào Ôn lỗi.
+- **Chơi với máy:** 7 mức từ ~400 tới Stockfish tối đa, có gợi ý và đi lại; ván đang chơi dở được lưu để chơi tiếp.
+- **Phân tích ván:** các ván đã chơi (hoặc dán PGN); phân loại từng nước (tốt nhất → sai nghiêm trọng), độ chính xác, biểu đồ đánh giá, thử lại nước sai và đưa vào Ôn lỗi.
 - **Drills:** 10 thế chiếu hết và tàn cuộc kinh điển (Lucena, Philidor, đối vương…) chơi với Stockfish.
 - **Luyện tọa độ** và **bàn phân tích** tự do.
 
@@ -24,7 +24,13 @@
 
 **Khác:** thống kê, mục tiêu hằng ngày, chuỗi ngày, 4 màu bàn cờ, sao lưu/khôi phục, cài lên màn hình chính điện thoại.
 
-Tiến độ được lưu trong trình duyệt (IndexedDB). Dùng **Cài đặt → Sao lưu** để chuyển dữ liệu sang máy khác. Kế hoạch tổng thể: [docs/PLAN.md](docs/PLAN.md).
+Kế hoạch tổng thể: [docs/PLAN.md](docs/PLAN.md).
+
+## Lưu dữ liệu
+
+- **Trong trình duyệt (mặc định):** mọi tiến độ được tự động lưu vào IndexedDB sau mỗi thao tác.
+- **Online (tùy chọn):** vào **Cài đặt → Lưu online**, tạo một token GitHub chỉ có quyền `gist` và dán vào. Ứng dụng lưu một bản sao vào một Gist bí mật trong tài khoản của bạn và tự đồng bộ khi có thay đổi. Mở trang trên máy khác, kết nối cùng tài khoản là chơi tiếp được. Dữ liệu từ hai máy được gộp (không ghi đè mất tiến độ); bản ghi đã xóa không bị khôi phục lại. Token chỉ nằm trong trình duyệt, không có trong Gist hay file sao lưu.
+- **File sao lưu:** **Cài đặt → Sao lưu / Khôi phục** (JSON).
 
 ## Phát triển
 

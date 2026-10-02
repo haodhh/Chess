@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { BoardTheme } from '../data/db';
+import { useSyncState } from '../data/sync';
+import { SyncSettings } from './SyncSettings';
 import { chooseLevelAgain, exportBackup, importBackup, resetAll, updateSettings, useProfile } from '../data/store';
 
 const BOARD_THEMES: { id: BoardTheme; name: string; light: string; dark: string }[] = [
@@ -13,6 +15,7 @@ const BOARD_THEMES: { id: BoardTheme; name: string; light: string; dark: string 
 export function SettingsPage() {
   const profile = useProfile();
   const navigate = useNavigate();
+  const syncConnected = !!useSyncState().config;
   const fileInput = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string | null>(null);
   if (!profile) return null;
@@ -82,11 +85,11 @@ export function SettingsPage() {
         </label>
       </section>
 
+      <SyncSettings />
+
       <section className="card">
-        <h2 className="mb-1 font-semibold">Dữ liệu</h2>
-        <p className="mb-3 text-sm text-muted">
-          Tiến độ chỉ được lưu trong trình duyệt này. Hãy sao lưu định kỳ, hoặc khi chuyển sang máy khác.
-        </p>
+        <h2 className="mb-1 font-semibold">Sao lưu & dữ liệu</h2>
+        <p className="mb-3 text-sm text-muted">Tải toàn bộ dữ liệu về một file để cất giữ, hoặc khôi phục từ file đó.</p>
         <div className="flex flex-wrap gap-2">
           <button className="btn" onClick={download}>
             ⬇ Sao lưu
@@ -115,7 +118,8 @@ export function SettingsPage() {
           <button
             className="btn text-bad"
             onClick={async () => {
-              if (confirm('Xóa toàn bộ dữ liệu (rating, lịch sử, ôn tập)? Không thể hoàn tác.')) {
+              const online = syncConnected ? ' Bản lưu online cũng sẽ bị xóa ở lần đồng bộ tới.' : '';
+              if (confirm(`Xóa toàn bộ dữ liệu (rating, lịch sử, ôn tập, ván cờ)? Không thể hoàn tác.${online}`)) {
                 await resetAll();
                 setMessage('Đã xóa dữ liệu.');
               }

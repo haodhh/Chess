@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { Chess } from 'chess.js';
-import { useNow } from '../../components/Layout';
+import { useNow } from '../../components/useNow';
 import { LineTrainer } from '../../components/LineTrainer';
 import { parseUci } from '../../core/chess';
 import type { Repertoire } from '../../data/db';

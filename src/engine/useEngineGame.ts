@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Chess, type Move } from 'chess.js';
 import type { Color } from '@lichess-org/chessground/types';
 import { colorOf, parseUci } from '../core/chess';
@@ -42,13 +42,19 @@ export interface EngineGameOptions {
   minThinkMs?: number;
   /** Stops the bot from replying, e.g. once a drill is decided. */
   paused?: boolean;
+  /** UCI moves already played, to resume a saved game. */
+  initialMoves?: string[];
 }
 
 /** A game between the user and a Stockfish bot. */
-export function useEngineGame({ startFen, userColor, level, minThinkMs = 500, paused }: EngineGameOptions) {
-  const chess = useMemo(() => new Chess(startFen), [startFen]);
-  const [moves, setMoves] = useState<Move[]>([]);
-  const [over, setOver] = useState<GameOver | null>(null);
+export function useEngineGame({ startFen, userColor, level, minThinkMs = 500, paused, initialMoves }: EngineGameOptions) {
+  const [chess] = useState(() => {
+    const c = new Chess(startFen);
+    for (const m of initialMoves ?? []) c.move(parseUci(m));
+    return c;
+  });
+  const [moves, setMoves] = useState<Move[]>(() => chess.history({ verbose: true }));
+  const [over, setOver] = useState<GameOver | null>(() => gameOverOf(chess));
   const [thinking, setThinking] = useState(false);
   const generation = useRef(0);
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { useNow } from '../components/Layout';
+import { useNow } from '../components/useNow';
 import { PuzzlePlayer, type PuzzleOutcome } from '../components/PuzzlePlayer';
 import { themeName } from '../core/themes';
 import type { ReviewCard } from '../data/db';

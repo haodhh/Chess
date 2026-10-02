@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router';
 import { useDueCount } from '../data/store';
+import { SyncStatus } from './SyncStatus';
+import { useNow } from './useNow';
 
 interface NavItem {
   to: string;
@@ -22,16 +23,6 @@ const NAV: NavItem[] = [
   { to: '/settings', icon: '⚙️', label: 'Cài đặt' },
 ];
 
-/** Re-renders every minute so time-based counts (due reviews) stay fresh. */
-export function useNow(intervalMs = 60_000) {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs]);
-  return now;
-}
-
 export function Layout() {
   const due = useDueCount(useNow()) ?? 0;
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -52,13 +43,17 @@ export function Layout() {
 
   return (
     <div className="min-h-screen lg:flex">
-      <aside className="hidden w-52 shrink-0 flex-col gap-1 border-r border-white/5 bg-[#1f1e1b] p-3 lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-52 shrink-0 flex-col gap-1 border-r border-white/5 bg-[#1f1e1b] p-3 lg:flex">
         <Brand />
         {items}
+        <div className="mt-auto">
+          <SyncStatus />
+        </div>
       </aside>
       <header className="sticky top-0 z-30 border-b border-white/5 bg-[#1f1e1b] lg:hidden">
-        <div className="px-4 pt-3">
+        <div className="flex items-center justify-between px-4 pt-3">
           <Brand />
+          <SyncStatus compact />
         </div>
         <nav className="flex gap-1 overflow-x-auto px-2 pb-2">{items}</nav>
       </header>

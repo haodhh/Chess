@@ -16,7 +16,7 @@ export function TrainHub() {
       to: '/train/games',
       icon: '📚',
       title: 'Phân tích ván',
-      desc: 'Nhập ván từ chess.com/Lichess, tìm sai lầm và luyện lại chính lỗi của bạn.',
+      desc: 'Xem lại các ván đã chơi, tìm sai lầm và luyện lại chính lỗi của bạn.',
       badge: unreviewed > 0 ? `${unreviewed} ván chưa phân tích` : `${games?.length ?? 0} ván`,
     },
     { to: '/train/drills', icon: '🏁', title: 'Drills', desc: 'Chiếu hết cơ bản và tàn cuộc kinh điển với Stockfish.', badge: `${stars}/${DRILLS.length * 3} ★` },

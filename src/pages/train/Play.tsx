@@ -10,21 +10,58 @@ import { BOT_LEVELS, type BotLevel } from '../../engine/bot';
 import { getEngine } from '../../engine/engine';
 import { useEngineGame } from '../../engine/useEngineGame';
 import { useProfile } from '../../data/store';
-import { saveGame } from '../../data/train';
+import { clearOngoingBotGame, saveGame, saveOngoingBotGame, useOngoingBotGame } from '../../data/train';
+
+interface Setup {
+  level: BotLevel;
+  color: Color;
+  key: number;
+  moves?: string[];
+}
 
 export function Play() {
-  const [setup, setSetup] = useState<{ level: BotLevel; color: Color; key: number } | null>(null);
+  const [setup, setSetup] = useState<Setup | null>(null);
   const [level, setLevel] = useState(BOT_LEVELS[2]);
   const [colorChoice, setColorChoice] = useState<Color | 'random'>('white');
+  const ongoing = useOngoingBotGame();
+  const ongoingLevel = ongoing ? BOT_LEVELS.find((b) => b.id === ongoing.levelId) : undefined;
 
   if (setup) {
-    return <BotGame key={setup.key} level={setup.level} userColor={setup.color} onNew={() => setSetup(null)} />;
+    return (
+      <BotGame
+        key={setup.key}
+        level={setup.level}
+        userColor={setup.color}
+        initialMoves={setup.moves}
+        onNew={() => setSetup(null)}
+      />
+    );
   }
 
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="mb-1 text-2xl font-extrabold">🤖 Chơi với máy</h1>
       <p className="mb-5 text-muted">Chọn đối thủ phù hợp. Sau ván đấu, hãy phân tích để tìm ra sai lầm của mình.</p>
+      {ongoing && ongoingLevel && (
+        <div className="card mb-5 flex flex-wrap items-center gap-3 border border-accent/60">
+          <span className="text-3xl">{ongoingLevel.avatar}</span>
+          <div className="flex-1">
+            <div className="font-bold">Ván đang chơi dở với {ongoingLevel.name}</div>
+            <div className="text-sm text-muted">
+              Bạn cầm {ongoing.userColor === 'white' ? 'Trắng' : 'Đen'} · đã đi {Math.ceil(ongoing.moves.length / 2)} nước
+            </div>
+          </div>
+          <button
+            className="btn btn-primary"
+            onClick={() => setSetup({ level: ongoingLevel, color: ongoing.userColor, moves: ongoing.moves, key: Date.now() })}
+          >
+            Tiếp tục ván
+          </button>
+          <button className="btn" onClick={() => confirm('Bỏ ván đang chơi dở?') && clearOngoingBotGame()}>
+            Bỏ ván
+          </button>
+        </div>
+      )}
       <div className="grid gap-2 sm:grid-cols-2">
         {BOT_LEVELS.map((b) => (
           <button
@@ -61,10 +98,27 @@ export function Play() {
   );
 }
 
-function BotGame({ level, userColor, onNew }: { level: BotLevel; userColor: Color; onNew: () => void }) {
+function BotGame({
+  level,
+  userColor,
+  initialMoves,
+  onNew,
+}: {
+  level: BotLevel;
+  userColor: Color;
+  initialMoves?: string[];
+  onNew: () => void;
+}) {
   const profile = useProfile();
   const navigate = useNavigate();
-  const { chess, moves, over, thinking, turn, userMove, takeback, resign } = useEngineGame({ userColor, level });
+  const { chess, moves, over, thinking, turn, userMove, takeback, resign } = useEngineGame({ userColor, level, initialMoves });
+
+  // Keep the game in progress saved so it can be resumed later (also on another device when synced).
+  useEffect(() => {
+    if (over) void clearOngoingBotGame();
+    else
+      void saveOngoingBotGame({ levelId: level.id, userColor, moves: moves.map((m) => m.from + m.to + (m.promotion ?? '')) });
+  }, [moves, over, level.id, userColor]);
   const [orientation, setOrientation] = useState<Color>(userColor);
   const [syncKey, setSyncKey] = useState(0);
   const [hint, setHint] = useState<DrawShape[]>([]);

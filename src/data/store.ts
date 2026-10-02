@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { decayRd, updateGlicko } from '../core/glicko2';
 import type { Puzzle } from '../core/puzzle';
 import type { Card } from 'ts-fsrs';
+import { naturalKey, RESET_AT, SYNC_TABLES, TOMBSTONES, type Row, type TableName, type Tables } from './merge';
 import { gradeFor, reviveCard, scheduleReview } from '../core/srs';
 import { db, type Attempt, type Profile, type PuzzleMode, type ReviewCard, type RushRun, type Settings } from './db';
 
@@ -43,21 +44,36 @@ export function currentRating(profile: Profile, now = Date.now()) {
   return decayRd(profile.rating, Math.floor((now - profile.ratedAt) / DAY));
 }
 
+/**
+ * Asks the browser not to evict our IndexedDB data under storage pressure.
+ * Returns whether storage is persistent (false if unsupported or refused).
+ */
+export async function requestPersistentStorage(): Promise<boolean> {
+  try {
+    if (!navigator.storage?.persist) return false;
+    return (await navigator.storage.persisted()) || (await navigator.storage.persist());
+  } catch {
+    return false;
+  }
+}
+
 /** Starts the puzzle rating at a self-reported level; the deviation is lower than for an unknown player. */
 export async function startWithLevel(rating: number) {
+  void requestPersistentStorage();
   const p = await getProfile();
-  await db.profile.put({ ...p, rating: { rating, rd: 200, vol: 0.06 }, ratedAt: Date.now(), onboarded: true });
+  const now = Date.now();
+  await db.profile.put({ ...p, rating: { rating, rd: 200, vol: 0.06 }, ratedAt: now, onboarded: true, updatedAt: now });
 }
 
 /** Shows the level picker again; the next pick resets the puzzle rating. */
 export async function chooseLevelAgain() {
   const p = await getProfile();
-  await db.profile.put({ ...p, onboarded: false });
+  await db.profile.put({ ...p, onboarded: false, updatedAt: Date.now() });
 }
 
 export async function updateSettings(patch: Partial<Settings>) {
   const p = await getProfile();
-  await db.profile.put({ ...p, settings: { ...p.settings, ...patch } });
+  await db.profile.put({ ...p, settings: { ...p.settings, ...patch }, updatedAt: Date.now() });
 }
 
 export interface AttemptInput {
@@ -86,7 +102,7 @@ export async function recordAttempt(input: AttemptInput): Promise<AttemptResult>
       const profile = await getProfile();
       const before = currentRating(profile, now);
       const after = updateGlicko(before, { rating: puzzle.rating, rd: PUZZLE_RD }, solved ? 1 : 0);
-      await db.profile.put({ ...profile, rating: after, ratedAt: now });
+      await db.profile.put({ ...profile, rating: after, ratedAt: now, updatedAt: now });
       result.ratingBefore = Math.round(before.rating);
       result.ratingAfter = Math.round(after.rating);
     }
@@ -139,6 +155,7 @@ export async function nextDueReview(now = Date.now()): Promise<ReviewCard | unde
 }
 
 export async function removeReview(puzzleId: string) {
+  await markDeleted('reviews', { puzzleId });
   await db.reviews.delete(puzzleId);
 }
 
@@ -156,60 +173,75 @@ export function useRushBest(): Record<string, number> | undefined {
   });
 }
 
-// ---------- Backup ----------
+// ---------- Backup, sync bookkeeping ----------
 
-const BACKUP_TABLES = [
-  'profile',
-  'attempts',
-  'reviews',
-  'rushRuns',
-  'games',
-  'drillResults',
-  'visionRuns',
-  'repertoire',
-  'lessons',
-] as const;
+/** Remembers that a record was deleted, so syncing does not bring it back. */
+export async function markDeleted(table: TableName, row: Row) {
+  const key = naturalKey(table, row);
+  await db.transaction('rw', db.kv, async () => {
+    const prev = ((await db.kv.get(TOMBSTONES))?.value as Record<string, number>) ?? {};
+    const now = Date.now();
+    await db.kv.put({ key: TOMBSTONES, value: { ...prev, [key]: now }, updatedAt: now });
+  });
+}
+
+export async function exportTables(): Promise<Tables> {
+  const tables: Tables = {};
+  for (const name of SYNC_TABLES) tables[name] = (await db.table(name).toArray()) as Row[];
+  return tables;
+}
+
+/** Replaces all local data with `tables`, restoring Date fields lost in JSON. */
+export async function replaceTables(tables: Tables) {
+  const revive = (rows: Row[]) =>
+    rows.map((row) => (row.card ? { ...row, card: reviveCard(row.card as Card) } : row));
+  await db.transaction('rw', SYNC_TABLES.map((n) => db.table(n)), async () => {
+    for (const name of SYNC_TABLES) {
+      await db.table(name).clear();
+      const rows = tables[name];
+      if (rows?.length) await db.table(name).bulkAdd(revive(rows));
+    }
+  });
+}
 
 interface Backup {
   app: 'chess-trainer';
   version: number;
   exportedAt: string;
-  tables: Partial<Record<(typeof BACKUP_TABLES)[number], unknown[]>>;
+  tables: Tables;
 }
 
 export async function exportBackup(): Promise<string> {
-  const tables: Backup['tables'] = {};
-  for (const name of BACKUP_TABLES) tables[name] = await db.table(name).toArray();
-  const backup: Backup = { app: 'chess-trainer', version: 2, exportedAt: new Date().toISOString(), tables };
+  const backup: Backup = { app: 'chess-trainer', version: 3, exportedAt: new Date().toISOString(), tables: await exportTables() };
   return JSON.stringify(backup);
 }
 
 type LegacyBackup = { profile?: Profile; attempts?: Attempt[]; reviews?: ReviewCard[]; rushRuns?: RushRun[] };
 
-export async function importBackup(json: string) {
+/** Parses a backup file (any version) into tables. */
+export function parseBackup(json: string): Tables {
   const data = JSON.parse(json) as Backup & LegacyBackup;
   if (data.app !== 'chess-trainer') throw new Error('File không phải bản sao lưu của ứng dụng này.');
   // Version 1 backups stored the four puzzle tables at the top level.
-  const tables: Backup['tables'] = data.tables ?? {
-    profile: data.profile ? [data.profile] : [],
-    attempts: data.attempts ?? [],
-    reviews: data.reviews ?? [],
-    rushRuns: data.rushRuns ?? [],
-  };
-  const revive = (rows: unknown[]) =>
-    rows.map((r) => {
-      const row = r as { card?: Card };
-      return row.card ? { ...row, card: reviveCard(row.card) } : row;
-    });
-  await db.transaction('rw', BACKUP_TABLES.map((n) => db.table(n)), async () => {
-    for (const name of BACKUP_TABLES) {
-      await db.table(name).clear();
-      const rows = tables[name];
-      if (rows?.length) await db.table(name).bulkPut(revive(rows));
+  return (
+    data.tables ?? {
+      profile: data.profile ? [data.profile as unknown as Row] : [],
+      attempts: (data.attempts ?? []) as unknown as Row[],
+      reviews: (data.reviews ?? []) as unknown as Row[],
+      rushRuns: (data.rushRuns ?? []) as unknown as Row[],
     }
-  });
+  );
 }
 
+export async function importBackup(json: string) {
+  await replaceTables(parseBackup(json));
+}
+
+/** Deletes everything; with online sync the reset also applies to the online copy. */
 export async function resetAll() {
-  await Promise.all(BACKUP_TABLES.map((n) => db.table(n).clear()));
+  const now = Date.now();
+  await db.transaction('rw', SYNC_TABLES.map((n) => db.table(n)), async () => {
+    for (const name of SYNC_TABLES) await db.table(name).clear();
+    await db.kv.put({ key: RESET_AT, value: now, updatedAt: now });
+  });
 }
