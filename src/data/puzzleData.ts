@@ -5,10 +5,9 @@ export interface PuzzleIndex {
   total: number;
   bandSize: number;
   bands: { band: number; count: number; file: string }[];
-  /** Long puzzles are rare in the rating shards, so each long move count has its own file. */
+  /** Long mates are rare in the rating shards, so each long move count has its own file of mates. */
   lengths?: { moves: number; count: number; file: string }[];
-  /** Puzzles available for each number of solver moves (all, and ending in mate). */
-  lengthCounts?: Record<string, number>;
+  /** Mates available for each number of solver moves. */
   mateLengthCounts?: Record<string, number>;
   themes: string[];
   themeCounts: Record<string, number>;

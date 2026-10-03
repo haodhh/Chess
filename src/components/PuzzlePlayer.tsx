@@ -4,7 +4,7 @@ import { Chess, type Move } from 'chess.js';
 import type { DrawShape } from '@lichess-org/chessground/draw';
 import type { Key } from '@lichess-org/chessground/types';
 import { colorOf, isPromotionMove, legalDests, parseUci, toUci, type Promotion } from '../core/chess';
-import { PuzzleSession, type Puzzle } from '../core/puzzle';
+import { puzzleGoal, PuzzleSession, solverMoves, type Puzzle, type PuzzleGoal } from '../core/puzzle';
 import { playSound } from '../core/sound';
 import { themeName } from '../core/themes';
 import type { Settings } from '../data/db';
@@ -201,7 +201,16 @@ export function PuzzlePlayer({ puzzle, settings, rush, onResult, onFinished, onN
       {/* On phones the status and buttons come right under the board; extras follow. */}
       <aside>
         {header && <div className={`flex flex-col gap-3 ${rush ? '' : 'order-1 lg:order-none'}`}>{header}</div>}
-        <StatusCard status={status} solver={solver} solverColor={session.solverColor} success={success} rush={rush} />
+        <StatusCard
+          status={status}
+          solver={solver}
+          solverColor={session.solverColor}
+          goal={puzzleGoal(puzzle)}
+          moves={solverMoves(puzzle)}
+          checkmate={session.chess.isCheckmate()}
+          success={success}
+          rush={rush}
+        />
 
         {!rush && !finished && (
           <div className="grid grid-cols-2 gap-2">
@@ -241,28 +250,52 @@ function buildLine(puzzle: Puzzle): LinePosition[] {
   return line;
 }
 
+const GOAL_TEXT: Record<PuzzleGoal, (moves: number) => string> = {
+  mate: (n) => (n === 1 ? 'Mục tiêu: chiếu hết ngay nước này.' : `Mục tiêu: chiếu hết sau ${n} nước.`),
+  advantage: () => 'Mục tiêu: thắng quân / giành lợi thế quyết định (không cần chiếu hết).',
+  equality: () => 'Mục tiêu: cứu thế cờ đang xấu, giữ cân bằng.',
+};
+
+/** Why a solved puzzle stops where it does. */
+const SOLVED: Record<PuzzleGoal, { icon: string; title: string; text?: string }> = {
+  mate: { icon: '🎉', title: 'Chiếu hết! Giải đúng' },
+  advantage: {
+    icon: '🎉',
+    title: 'Giải đúng!',
+    text: 'Đây là bài thắng quân: sau nước này bạn đã thắng rõ nên bài dừng ở đây, không cần chiếu hết.',
+  },
+  equality: { icon: '🎉', title: 'Giải đúng!', text: 'Bạn đã cứu được thế cờ.' },
+};
+
 function StatusCard({
   status,
   solver,
   solverColor,
+  goal,
+  moves,
+  checkmate,
   success,
   rush,
 }: {
   status: Status;
   solver: string;
   solverColor: 'white' | 'black';
+  goal: PuzzleGoal;
+  moves: number;
+  /** The game on the board ended in checkmate. */
+  checkmate: boolean;
   success: boolean;
   rush?: boolean;
 }) {
   const content: Record<Status, { icon: ReactNode; title: string; text?: string; tone: string }> = {
     setup: { icon: '⏳', title: 'Đối thủ đang đi…', tone: 'bg-panel' },
-    play: { icon: <PieceIcon color={solverColor} className="h-9 w-9" />, title: `Bạn cầm quân ${solver}`, text: 'Tìm nước đi tốt nhất.', tone: 'bg-panel' },
+    play: { icon: <PieceIcon color={solverColor} className="h-9 w-9" />, title: `Bạn cầm quân ${solver}`, text: GOAL_TEXT[goal](moves), tone: 'bg-panel' },
     correct: { icon: '✓', title: 'Chính xác!', text: 'Tiếp tục…', tone: 'bg-good/20 border-good' },
     wrong: { icon: '✗', title: 'Chưa đúng', text: 'Thử nước khác nhé.', tone: 'bg-bad/20 border-bad' },
     revealing: { icon: '👁', title: 'Đang hiện lời giải…', tone: 'bg-panel' },
     solved: success
-      ? { icon: '🎉', title: 'Giải đúng!', tone: 'bg-good/20 border-good' }
-      : { icon: '✓', title: 'Đã giải xong', text: 'Không tính là đúng vì đã đi sai hoặc dùng gợi ý.', tone: 'bg-panel' },
+      ? { ...SOLVED[checkmate ? 'mate' : goal === 'mate' ? 'advantage' : goal], tone: 'bg-good/20 border-good' }
+      : { icon: '✓', title: checkmate ? 'Chiếu hết' : 'Đã giải xong', text: 'Không tính là đúng vì đã đi sai hoặc dùng gợi ý.', tone: 'bg-panel' },
     failed: rush
       ? { icon: '✗', title: 'Sai rồi!', tone: 'bg-bad/20 border-bad' }
       : { icon: '📘', title: 'Lời giải', text: 'Bài này đã được thêm vào mục Ôn lỗi.', tone: 'bg-panel' },

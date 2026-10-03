@@ -57,7 +57,7 @@ export function Home() {
 
       <section className="card !p-3 sm:!p-4">
         <div className="mb-2 flex items-baseline justify-between gap-2">
-          <h2 className="font-bold">🔢 Thắng trong … nước</h2>
+          <h2 className="font-bold">♚ Chiếu hết trong … nước</h2>
           <Link to="/moves" className="link text-sm">
             Tất cả
           </Link>
@@ -68,7 +68,7 @@ export function Home() {
               key={n}
               to={`/moves/${n}`}
               className="flex h-11 items-center justify-center rounded-lg bg-panel-2 text-lg font-extrabold transition-colors hover:bg-accent hover:text-white"
-              aria-label={`Thắng trong ${n} nước`}
+              aria-label={`Chiếu hết trong ${n} nước`}
             >
               {n}
             </Link>

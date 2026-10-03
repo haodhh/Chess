@@ -5,12 +5,13 @@
 //   curl -L https://database.lichess.org/lichess_db_puzzle.csv.zst | zstd -dc | node scripts/build-puzzles.mjs
 //   node scripts/build-puzzles.mjs path/to/lichess_db_puzzle.csv
 //
-// Besides the rating shards, puzzles that take LONG_MIN..LONG_MAX of the solver's moves are
-// rare, so they get their own reservoirs (with looser popularity filters) and one file per
-// move count (m05.json … m10.json).
+// Besides the rating shards, mates in LONG_MIN..LONG_MAX of the solver's moves are rare, so they
+// get their own reservoirs (with looser popularity filters) and one file per move count
+// (m05.json … m10.json). Every line is replayed: the "mate" theme is kept only on puzzles whose
+// solution really ends in checkmate (and added where Lichess left it out).
 //
-// Environment overrides: PER_BAND, MIN_POPULARITY, MIN_PLAYS, MAX_RD, PER_LENGTH, PER_LENGTH_MATE,
-// LONG_MIN_POPULARITY, LONG_MIN_PLAYS, LONG_MAX_RD, OUT_DIR, SEED.
+// Environment overrides: PER_BAND, MIN_POPULARITY, MIN_PLAYS, MAX_RD, PER_LENGTH_MATE,
+// LONG_MIN_POPULARITY, LONG_MIN_PLAYS, OUT_DIR, SEED.
 
 import { createReadStream } from 'node:fs';
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
@@ -22,11 +23,9 @@ const PER_BAND = Number(process.env.PER_BAND ?? 2500);
 const MIN_POPULARITY = Number(process.env.MIN_POPULARITY ?? 80);
 const MIN_PLAYS = Number(process.env.MIN_PLAYS ?? 300);
 const MAX_RD = Number(process.env.MAX_RD ?? 90);
-const PER_LENGTH = Number(process.env.PER_LENGTH ?? 600);
-const PER_LENGTH_MATE = Number(process.env.PER_LENGTH_MATE ?? 300);
-const LONG_MIN_POPULARITY = Number(process.env.LONG_MIN_POPULARITY ?? 60);
-const LONG_MIN_PLAYS = Number(process.env.LONG_MIN_PLAYS ?? 100);
-const LONG_MAX_RD = Number(process.env.LONG_MAX_RD ?? 110);
+const PER_LENGTH_MATE = Number(process.env.PER_LENGTH_MATE ?? 800);
+const LONG_MIN_POPULARITY = Number(process.env.LONG_MIN_POPULARITY ?? 50);
+const LONG_MIN_PLAYS = Number(process.env.LONG_MIN_PLAYS ?? 30);
 const OUT_DIR = process.env.OUT_DIR ?? path.join('public', 'data', 'puzzles');
 const SEED = Number(process.env.SEED ?? 20261002);
 
@@ -58,16 +57,31 @@ function mulberry32(seed) {
   };
 }
 
-export function isValidPuzzle(fen, moves) {
+/** Plays the whole line: is every move legal, and does it end in checkmate? */
+export function replayPuzzle(fen, moves) {
   try {
     const chess = new Chess(fen);
     for (const uci of moves) {
       chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] });
     }
-    return moves.length >= 2;
+    return { valid: moves.length >= 2, mate: chess.isCheckmate() };
   } catch {
-    return false;
+    return { valid: false, mate: false };
   }
+}
+
+export function isValidPuzzle(fen, moves) {
+  return replayPuzzle(fen, moves).valid;
+}
+
+const MATE_THEME = /^mate(In\d+)?$/;
+
+/** Drops illegal puzzles and makes the mate themes match what the line really does. */
+export function checkPuzzle(p) {
+  const { valid, mate } = replayPuzzle(p.fen, p.moves);
+  if (!valid) return null;
+  if (mate) return p.themes.includes('mate') ? p : { ...p, themes: [...p.themes, 'mate'] };
+  return p.themes.some((t) => MATE_THEME.test(t)) ? { ...p, themes: p.themes.filter((t) => !MATE_THEME.test(t)) } : p;
 }
 
 /** Keeps a uniform random sample of `size` items (reservoir sampling). */
@@ -84,7 +98,6 @@ function offer(res, item, size, rand) {
 export async function buildPuzzles(input, { outDir = OUT_DIR } = {}) {
   const rand = mulberry32(SEED);
   const reservoirs = new Map(); // band -> { seen, items }
-  const longAll = new Map(); // move count -> { seen, items }
   const longMate = new Map(); // move count -> { seen, items }, mates only
   const rl = createInterface({ input, crlfDelay: Infinity });
   let header = null;
@@ -117,16 +130,10 @@ export async function buildPuzzles(input, { outDir = OUT_DIR } = {}) {
     };
 
     const n = solverMoves(item.moves);
-    if (n >= LONG_MIN && n <= LONG_MAX && popularity >= LONG_MIN_POPULARITY && plays >= LONG_MIN_PLAYS && rd <= LONG_MAX_RD) {
-      for (const [map, size, ok] of [
-        [longAll, PER_LENGTH, true],
-        [longMate, PER_LENGTH_MATE, item.themes.includes('mate')],
-      ]) {
-        if (!ok) continue;
-        let res = map.get(n);
-        if (!res) map.set(n, (res = { seen: 0, items: [] }));
-        offer(res, item, size, rand);
-      }
+    if (n >= LONG_MIN && n <= LONG_MAX && item.themes.includes('mate') && popularity >= LONG_MIN_POPULARITY && plays >= LONG_MIN_PLAYS) {
+      let res = longMate.get(n);
+      if (!res) longMate.set(n, (res = { seen: 0, items: [] }));
+      offer(res, item, PER_LENGTH_MATE, rand);
     }
 
     if (popularity < MIN_POPULARITY || plays < MIN_PLAYS || rd > MAX_RD) continue;
@@ -143,16 +150,15 @@ export async function buildPuzzles(input, { outDir = OUT_DIR } = {}) {
   };
   const byRating = (a, b) => a.rating - b.rating || a.id.localeCompare(b.id);
   const bands = [];
+  const checked = (items) => items.map(checkPuzzle).filter(Boolean).sort(byRating);
   for (const [band, res] of [...reservoirs.entries()].sort((a, b) => a[0] - b[0])) {
-    const valid = res.items.filter((p) => isValidPuzzle(p.fen, p.moves)).sort(byRating);
+    const valid = checked(res.items);
     countThemes(valid);
     bands.push({ band, puzzles: valid });
   }
   const lengths = [];
   for (let n = LONG_MIN; n <= LONG_MAX; n++) {
-    const unique = new Map();
-    for (const p of [...(longAll.get(n)?.items ?? []), ...(longMate.get(n)?.items ?? [])]) unique.set(p.id, p);
-    const valid = [...unique.values()].filter((p) => isValidPuzzle(p.fen, p.moves)).sort(byRating);
+    const valid = checked(longMate.get(n)?.items ?? []).filter((p) => p.themes.includes('mate'));
     lengths.push({ moves: n, puzzles: valid });
   }
   // themeCounts describes the rating shards (theme training); themes only seen in the move-count files go last.
@@ -166,14 +172,11 @@ export async function buildPuzzles(input, { outDir = OUT_DIR } = {}) {
     if (f.endsWith('.json')) await rm(path.join(outDir, f));
   }
   const bandMeta = [];
-  // Puzzles available for each move count: the rating shards below LONG_MIN, the move-count files from it on.
-  const lengthCounts = {};
+  // Mates available for each move count: the rating shards below LONG_MIN, the move-count files from it on.
   const mateLengthCounts = {};
   const tally = (p) => {
     const n = solverMoves(p.moves);
-    if (n > LONG_MAX) return;
-    lengthCounts[n] = (lengthCounts[n] ?? 0) + 1;
-    if (p.themes.includes('mate')) mateLengthCounts[n] = (mateLengthCounts[n] ?? 0) + 1;
+    if (n <= LONG_MAX && p.themes.includes('mate')) mateLengthCounts[n] = (mateLengthCounts[n] ?? 0) + 1;
   };
   for (const { band, puzzles } of bands) {
     if (puzzles.length === 0) continue;
@@ -198,13 +201,12 @@ export async function buildPuzzles(input, { outDir = OUT_DIR } = {}) {
     total: bandMeta.reduce((s, b) => s + b.count, 0),
     bands: bandMeta,
     lengths: lengthMeta,
-    lengthCounts,
     mateLengthCounts,
     themes,
     themeCounts: Object.fromEntries(themeCounts),
   };
   await writeFile(path.join(outDir, 'index.json'), JSON.stringify(index, null, 1));
-  return { total, kept, written: index.total, bands: bandMeta.length, themes: themes.length, lengthCounts, mateLengthCounts };
+  return { total, kept, written: index.total, bands: bandMeta.length, themes: themes.length, mateLengthCounts };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
@@ -215,5 +217,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     `Read ${stats.total} puzzles, ${stats.kept} passed filters, wrote ${stats.written} ` +
       `in ${stats.bands} bands (${stats.themes} themes) to ${OUT_DIR}`,
   );
-  console.log('Puzzles per move count:', stats.lengthCounts, 'mates:', stats.mateLengthCounts);
+  console.log('Mates per move count:', stats.mateLengthCounts);
 }

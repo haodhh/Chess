@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import { PuzzleTrainer } from '../components/PuzzleTrainer';
 import { lengthStats } from '../core/stats';
 import { loadIndex, MAX_MOVES, type PuzzleIndex } from '../data/puzzleData';
@@ -20,7 +20,7 @@ const LEVEL: Record<number, string> = {
   10: 'Bậc thầy',
 };
 
-const movesTitle = (n: number, mate: boolean) => `${mate ? 'Chiếu hết' : 'Thắng'} trong ${n} nước`;
+const title = (n: number) => `Chiếu hết trong ${n} nước`;
 
 function usePuzzleIndex() {
   const [index, setIndex] = useState<PuzzleIndex | null>(null);
@@ -30,57 +30,31 @@ function usePuzzleIndex() {
   return index;
 }
 
-const countFor = (index: PuzzleIndex | null, n: number, mate: boolean) =>
-  (mate ? index?.mateLengthCounts : index?.lengthCounts)?.[n];
+const countFor = (index: PuzzleIndex | null, n: number) => index?.mateLengthCounts?.[n];
 
-const href = (n: number, mate: boolean) => `/moves/${n}${mate ? '?mate=1' : ''}`;
-
-function MateToggle({ mate, onChange }: { mate: boolean; onChange: (mate: boolean) => void }) {
-  return (
-    <div className="grid grid-cols-2 gap-1 rounded-lg bg-panel-2 p-1 text-sm font-semibold" role="radiogroup" aria-label="Loại bài">
-      {[false, true].map((m) => (
-        <button
-          key={String(m)}
-          role="radio"
-          aria-checked={mate === m}
-          className={`min-h-9 rounded-md px-3 ${mate === m ? 'bg-accent text-white' : 'text-stone-300 hover:bg-white/10'}`}
-          onClick={() => onChange(m)}
-        >
-          {m ? '♚ Chỉ chiếu hết' : '🏆 Tất cả'}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/** Picks puzzles by how many moves the solution takes: win (or mate) in 1 … 10. */
+/** Mates in 1 … 10 of the solver's moves. */
 export function MoveCounts() {
   const index = usePuzzleIndex();
   const attempts = useAttempts();
-  const [params, setParams] = useSearchParams();
-  const mate = params.get('mate') === '1';
-  const stats = useMemo(() => lengthStats(attempts ?? [], mate), [attempts, mate]);
+  const stats = useMemo(() => lengthStats(attempts ?? [], true), [attempts]);
 
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-extrabold">Puzzle theo số nước</h1>
+      <h1 className="mb-1 text-2xl font-extrabold">Chiếu hết trong N nước</h1>
       <p className="mb-4 text-muted">
-        Mỗi bài cần tìm đúng số nước đi của bạn để thắng: chiếu hết, hoặc giành lợi thế quyết định (ăn quân, phong hậu…). Càng
-        nhiều nước càng phải tính xa. Kết quả vẫn tính vào rating.
+        Mỗi bài là một thế cờ từ ván đấu thật, có cách chiếu hết bắt buộc sau đúng N nước của bạn dù đối thủ chống đỡ tốt nhất.
+        Bài chỉ hoàn thành khi bạn chiếu hết. Kết quả vẫn tính vào rating.
       </p>
-      <div className="mb-4 max-w-md">
-        <MateToggle mate={mate} onChange={(m) => setParams(m ? { mate: '1' } : {}, { replace: true })} />
-      </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         {COUNTS.map((n) => {
-          const count = countFor(index, n, mate);
+          const count = countFor(index, n);
           const empty = index !== null && !count;
           const s = stats.get(n);
           const body = (
             <>
-              <div className="flex items-baseline gap-1.5" title={movesTitle(n, mate)}>
+              <div className="flex items-baseline gap-1.5" title={title(n)}>
                 <span className="text-3xl font-extrabold text-accent">{n}</span>
-                <span className="font-semibold">nước{mate && ' ♚'}</span>
+                <span className="font-semibold">nước</span>
               </div>
               <div className="mt-0.5 text-xs text-muted">
                 {LEVEL[n]}
@@ -104,7 +78,7 @@ export function MoveCounts() {
               {body}
             </div>
           ) : (
-            <Link key={n} to={href(n, mate)} className="card block !p-3 transition-colors hover:bg-panel-2 sm:!p-4">
+            <Link key={n} to={`/moves/${n}`} className="card block !p-3 transition-colors hover:bg-panel-2 sm:!p-4">
               {body}
             </Link>
           );
@@ -114,30 +88,21 @@ export function MoveCounts() {
   );
 }
 
-/** Rated puzzles that take exactly `n` moves, with a picker to switch the count. */
+/** Rated mates in exactly `n` moves, with a picker to switch the count. */
 export function MovePuzzles() {
   const n = Math.min(MAX_MOVES, Math.max(1, Math.round(Number(useParams().n)) || 1));
-  const [params] = useSearchParams();
-  const mate = params.get('mate') === '1';
   const index = usePuzzleIndex();
 
   const picker = (
     <div className="mb-3 border-b border-white/10 pb-3">
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <div className="font-bold">
-          {mate ? '♚' : '🏆'} {movesTitle(n, mate)}
-        </div>
-        <Link to={href(n, !mate)} replace className="btn btn-sm shrink-0">
-          {mate ? 'Xem tất cả' : 'Chỉ chiếu hết'}
-        </Link>
-      </div>
+      <div className="mb-2 font-bold">♚ {title(n)}</div>
       <div className="grid grid-cols-5 gap-1" aria-label="Số nước">
         {COUNTS.map((k) => {
-          const empty = index !== null && !countFor(index, k, mate);
+          const empty = index !== null && !countFor(index, k);
           return (
             <Link
               key={k}
-              to={href(k, mate)}
+              to={`/moves/${k}`}
               replace
               aria-current={k === n ? 'page' : undefined}
               className={`flex h-9 items-center justify-center rounded-md text-sm font-bold ${
@@ -154,10 +119,10 @@ export function MovePuzzles() {
 
   return (
     <div>
-      <Link to={mate ? '/moves?mate=1' : '/moves'} className="back-link mb-1">
+      <Link to="/moves" className="back-link mb-1">
         ← Chọn số nước
       </Link>
-      <PuzzleTrainer key={`${n}-${mate}`} mode="moves" moves={n} mateOnly={mate} top={picker} />
+      <PuzzleTrainer key={n} mode="moves" moves={n} mateOnly top={picker} />
     </div>
   );
 }

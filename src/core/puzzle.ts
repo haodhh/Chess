@@ -22,6 +22,18 @@ export function isMatePuzzle(puzzle: Pick<Puzzle, 'themes'>): boolean {
   return puzzle.themes.includes('mate');
 }
 
+/**
+ * What a puzzle asks for. Lichess puzzles (like Chess.com's) end either in checkmate or as soon
+ * as the solver's advantage is decisive, e.g. after winning a piece; "equality" ones ask the
+ * solver to save a worse position.
+ */
+export type PuzzleGoal = 'mate' | 'advantage' | 'equality';
+
+export function puzzleGoal(puzzle: Pick<Puzzle, 'themes'>): PuzzleGoal {
+  if (isMatePuzzle(puzzle)) return 'mate';
+  return puzzle.themes.includes('equality') ? 'equality' : 'advantage';
+}
+
 export type MoveVerdict = 'wrong' | 'correct' | 'solved';
 
 /**
